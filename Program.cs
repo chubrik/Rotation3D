@@ -12,7 +12,7 @@ using Trigonometry;
 
 //quaternion.ToMatrix();
 //quaternion.ToEulerAngles();
-//quaternion.ToEulerAngles_NotNormalizedQuaternion();
+//quaternion.ToEulerAngles_NormalizedQuaternion();
 //quaternion.ToAxisAngle();
 //quaternion.IsNormalized();
 //quaternion.Normalize();
@@ -28,7 +28,7 @@ using Trigonometry;
 var e1 = EulerAngles.CreateFromDegrees(yaw: 60, pitch: 45, roll: 30);
 var q1 = e1.ToQuaternion();
 var e1a = q1.ToEulerAngles();
-var e1b = q1.ToEulerAngles_NotNormalizedQuaternion();
+var e1b = q1.ToEulerAngles_NormalizedQuaternion();
 
 return;
 

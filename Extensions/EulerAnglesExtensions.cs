@@ -2,9 +2,8 @@
 
 using System.Numerics;
 
-internal static class EulerAnglesExtensions
+public static class EulerAnglesExtensions
 {
-    [Obsolete("Not tested.")]
     public static Matrix4x4 ToMatrix(this EulerAngles eulerAngles)
     {
         return Matrix4x4.CreateFromYawPitchRoll(

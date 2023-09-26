@@ -1,9 +1,8 @@
 ﻿namespace Trigonometry;
 
-using System.Diagnostics;
 using System.Numerics;
 
-internal static class AxisAngleExtensions
+public static class AxisAngleExtensions
 {
     [Obsolete("Not tested.")]
     public static Matrix4x4 ToMatrix(this AxisAngle axisAngle)
@@ -16,10 +15,8 @@ internal static class AxisAngleExtensions
     [Obsolete("Not tested.")]
     public static Quaternion ToQuaternion(this AxisAngle axisAngle)
     {
-        Debug.Assert(axisAngle.Axis.IsNormalized());
-
         return Quaternion.CreateFromAxisAngle(
-            axis: axisAngle.Axis,
+            axis: axisAngle.Axis.Normalize(), // Vector must be normalized
             angle: axisAngle.Angle);
     }
 
@@ -27,5 +24,16 @@ internal static class AxisAngleExtensions
     public static EulerAngles ToEulerAngles(this AxisAngle axisAngle)
     {
         throw new NotImplementedException();
+    }
+
+    public static AxisAngle Normalize(this AxisAngle axisAngle)
+    {
+        return new AxisAngle(axis: axisAngle.Axis.Normalize(), angle: axisAngle.Angle);
+    }
+
+    // For debug only
+    public static bool IsNormalised(this AxisAngle axisAngle)
+    {
+        return axisAngle.Axis.IsNormalized();
     }
 }
