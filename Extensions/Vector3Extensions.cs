@@ -7,13 +7,22 @@ public static class Vector3Extensions
 {
     public static Vector3 Normalize(this Vector3 vector)
     {
-        return Vector3.Normalize(vector);
+        // Reference:
+        // return Vector3.Normalize(vector);
+
+        var (x, y, z) = (vector.X, vector.Y, vector.Z);
+
+        var invNorm = 1f / Sqrt(x * x + y * y + z * z);
+        return new Vector3(x * invNorm, y * invNorm, z * invNorm);
     }
 
-    // For debug only
-    public static bool IsNormalized(this Vector3 vector)
+    /// <summary>
+    /// For debug only
+    /// </summary>
+    public static bool IsUnit(this Vector3 vector)
     {
         var (x, y, z) = (vector.X, vector.Y, vector.Z);
-        return Abs(x * x + y * y + z * z - 1) < 0.00000036;
+
+        return Abs(x * x + y * y + z * z - 1f) < 0.00000036f;
     }
 }

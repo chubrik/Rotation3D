@@ -3,6 +3,7 @@
 using System.Diagnostics;
 using static Constants;
 
+// Reference:
 // https://www.euclideanspace.com/maths/geometry/rotations/euler/
 
 [DebuggerDisplay("yaw (y): {YawDegrees}°, pitch (x): {PitchDegrees}°, roll (z): {RollDegrees}°")]
@@ -10,13 +11,19 @@ public readonly struct EulerAngles
 {
     public static readonly EulerAngles Identity = default;
 
-    // Aka heading, azimuth, Y axis. Applied first.
+    /// <summary>
+    /// Aka heading, azimuth, Y axis. Applied first.
+    /// </summary>
     public readonly float Yaw;
 
-    // Aka attitude, elevation, X axis. Applied second.
+    /// <summary>
+    /// Aka attitude, elevation, X axis. Applied second.
+    /// </summary>
     public readonly float Pitch;
 
-    // Aka bank, tilt, Z axis. Applied last.
+    /// <summary>
+    /// Aka bank, tilt, Z axis. Applied last.
+    /// </summary>
     public readonly float Roll;
 
     public EulerAngles(float yaw, float pitch, float roll)
@@ -40,7 +47,7 @@ public readonly struct EulerAngles
 
     public static EulerAngles CreateFromDegrees(float yaw, float pitch, float roll)
     {
-        return new EulerAngles(yaw: yaw * DEG_TO_RAD, pitch: pitch * DEG_TO_RAD, roll: roll * DEG_TO_RAD);
+        return new EulerAngles(yaw * DEG_TO_RAD, pitch * DEG_TO_RAD, roll * DEG_TO_RAD);
     }
 
     public static EulerAngles CreateFromXYZ(float x, float y, float z)

@@ -22,6 +22,6 @@ public readonly struct AxisAngle
 
     public static AxisAngle CreateFromDegrees(Vector3 axis, float angle)
     {
-        return new AxisAngle(axis: axis, angle: angle * DEG_TO_RAD);
+        return new AxisAngle(axis, angle * DEG_TO_RAD);
     }
 }

@@ -1,13 +1,9 @@
-﻿Formulas reference for converting different rotation representations.
+﻿The reference of formulas for converting various 3D rotation formats.
 <br><br>
 
-| | To Matrix | To Quaternion | To EulerAngles | To AxisAngle |
+| | To Matrix4x4 | To Quaternion | To EulerAngles | To AxisAngle |
 | :-- | :-- | :-- | :-- | :-- |
-| **Matrix** | | ✅ Native | ✅ Custom \* | ❌ not implemented |
-| **Quaternion** | ✅ Native | | ✅ Custom \*\* | ⚠️ Custom<br>(not tested) |
-| **EulerAngles** | ✅ Native | ✅ Native | | ❌ not implemented |
-| **AxisAngle** | ⚠️ Native<br>(not tested) | ⚠️ Native<br>(not tested) | ❌ not implemented | |
-
-<br>\* Supports a uniformly scaled matrix. Has an additional optimized implementation for the unscaled one.
-
-\** Has an additional optimized implementation for the normalized quaternion.
+| **Matrix4x4**<br>*Matrix4x4 (scaled)* | – | ✅ Ok<br>⚠️ *Not tested* | ✅ Ok<br>✅ *Ok* | ❌ Not yet |
+| **Quaternion**<br>*Quaternion (non-unit)* | ✅ Ok<br>⚠️ *Not tested* | – | ✅ Ok<br>✅ *Ok* | ⚠️ Not tested |
+| **EulerAngles** | ⚠️ Not direct | ✅ Ok | – | ❌ Not yet |
+| **AxisAngle**<br>*AxisAngle (non-unit)* | ⚠️ Not tested | ⚠️ Not tested | ❌ Not yet | – |
