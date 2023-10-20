@@ -1,12 +1,10 @@
 ﻿namespace Rotation3D;
 
-using System.Diagnostics;
-using static Constants;
+using static MathFConstants;
 
 // Reference:
 // https://www.euclideanspace.com/maths/geometry/rotations/euler/
 
-[DebuggerDisplay("yaw (y): {YawDegrees}°, pitch (x): {PitchDegrees}°, roll (z): {RollDegrees}°")]
 public struct EulerAngles
 {
     public static readonly EulerAngles Identity = default;
@@ -58,5 +56,10 @@ public struct EulerAngles
     public static EulerAngles CreateFromXYZDegrees(float x, float y, float z)
     {
         return new EulerAngles(yaw: y * DEG_TO_RAD, pitch: x * DEG_TO_RAD, roll: z * DEG_TO_RAD);
+    }
+
+    public override readonly string ToString()
+    {
+        return $"{{YAW:{Yaw} PITCH:{Pitch} ROLL:{Roll}}} {{YAW:{YawDegrees}° PITCH:{PitchDegrees}° ROLL:{RollDegrees}°}}";
     }
 }

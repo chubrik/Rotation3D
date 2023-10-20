@@ -1,14 +1,25 @@
 ﻿namespace Rotation3D;
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rotation3D.Tests;
 using System.Numerics;
-using static System.MathF;
+using static CommonFormulas;
+using static MathF;
 
 public static class AxisAngleFormulas
 {
-    public static Matrix4x4 ToMatrix(this AxisAngle axisAngle)
+    public static AxisAngle Normalize(this AxisAngle axisAngle)
+    {
+        return new AxisAngle(
+            axis: axisAngle.Axis.Normalize(),
+            angle: NormalizeAngle(axisAngle.Angle));
+    }
+
+    public static Matrix4x4 ToMatrix4x4(this AxisAngle axisAngle)
     {
         // Reference: Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
+        Assert.IsTrue(axisAngle.IsNormal());
         var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
@@ -27,45 +38,38 @@ public static class AxisAngleFormulas
         var xz_caxz = xz - ca * xz;
         var yz_cayz = yz - ca * yz;
 
-        var m11 = xx + ca * (1f - xx);
-        var m12 = xy_caxy + saz;
-        var m13 = xz_caxz - say;
+        var matrix = Matrix4x4.Identity;
 
-        var m21 = xy_caxy - saz;
-        var m22 = yy + ca * (1f - yy);
-        var m23 = yz_cayz + sax;
+        matrix.M11 = xx + ca * (1f - xx);
+        matrix.M12 = xy_caxy + saz;
+        matrix.M13 = xz_caxz - say;
 
-        var m31 = xz_caxz + say;
-        var m32 = yz_cayz - sax;
-        var m33 = zz + ca * (1f - zz);
+        matrix.M21 = xy_caxy - saz;
+        matrix.M22 = yy + ca * (1f - yy);
+        matrix.M23 = yz_cayz + sax;
 
-        return new Matrix4x4(m11, m12, m13, 0f, m21, m22, m23, 0f, m31, m32, m33, 0f, 0f, 0f, 0f, 1f);
+        matrix.M31 = xz_caxz + say;
+        matrix.M32 = yz_cayz - sax;
+        matrix.M33 = zz + ca * (1f - zz);
+
+        return matrix;
     }
 
     public static Quaternion ToQuaternion(this AxisAngle axisAngle)
     {
-        // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis.Normalize(), axisAngle.Angle);
+        // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
-        var normAxis = axisAngle.Axis.Normalize(); // Vector must be normalized
-        var (x, y, z, angle) = (normAxis.X, normAxis.Y, normAxis.Z, axisAngle.Angle);
+        Assert.IsTrue(axisAngle.IsNormal());
+        var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
 
         var halfAngle = angle * 0.5f;
-        var s = Sin(halfAngle);
+        var sa = Sin(halfAngle);
+
+        var qX = x * sa;
+        var qY = y * sa;
+        var qZ = z * sa;
         var qW = Cos(halfAngle);
-        var qX = x * s;
-        var qY = y * s;
-        var qZ = z * s;
 
         return new Quaternion(qX, qY, qZ, qW);
-    }
-
-    public static EulerAngles ToEulerAngles(this AxisAngle axisAngle)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static AxisAngle Normalize(this AxisAngle axisAngle)
-    {
-        return new AxisAngle(axisAngle.Axis.Normalize(), axisAngle.Angle);
     }
 }
