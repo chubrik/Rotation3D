@@ -1,15 +1,13 @@
-﻿namespace Trigonometry;
+﻿namespace Rotation3D;
 
 using System.Numerics;
 using static System.MathF;
 
-public static class EulerAnglesExtensions
+public static class EulerAnglesFormulas
 {
-    [Obsolete("Not direct.")]
     public static Matrix4x4 ToMatrix(this EulerAngles eulerAngles)
     {
-        // Reference:
-        // return Matrix4x4.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
+        // Reference: Matrix4x4.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
@@ -19,8 +17,7 @@ public static class EulerAnglesExtensions
 
     public static Quaternion ToQuaternion(this EulerAngles eulerAngles)
     {
-        // Reference:
-        // return Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
+        // Reference: Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
@@ -48,7 +45,6 @@ public static class EulerAnglesExtensions
         return new Quaternion(qX, qY, qZ, qW);
     }
 
-    [Obsolete("Not implemented.")]
     public static AxisAngle ToAxisAngle(this EulerAngles eulerAngles)
     {
         throw new NotImplementedException();

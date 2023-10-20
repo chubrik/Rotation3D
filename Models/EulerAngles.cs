@@ -1,4 +1,4 @@
-﻿namespace Trigonometry;
+﻿namespace Rotation3D;
 
 using System.Diagnostics;
 using static Constants;
@@ -7,24 +7,24 @@ using static Constants;
 // https://www.euclideanspace.com/maths/geometry/rotations/euler/
 
 [DebuggerDisplay("yaw (y): {YawDegrees}°, pitch (x): {PitchDegrees}°, roll (z): {RollDegrees}°")]
-public readonly struct EulerAngles
+public struct EulerAngles
 {
     public static readonly EulerAngles Identity = default;
 
     /// <summary>
     /// Aka heading, azimuth, Y axis. Applied first.
     /// </summary>
-    public readonly float Yaw;
+    public float Yaw;
 
     /// <summary>
     /// Aka attitude, elevation, X axis. Applied second.
     /// </summary>
-    public readonly float Pitch;
+    public float Pitch;
 
     /// <summary>
     /// Aka bank, tilt, Z axis. Applied last.
     /// </summary>
-    public readonly float Roll;
+    public float Roll;
 
     public EulerAngles(float yaw, float pitch, float roll)
     {
@@ -33,17 +33,17 @@ public readonly struct EulerAngles
         Roll = roll;
     }
 
-    public float YawDegrees => Yaw * RAD_TO_DEG;
-    public float PitchDegrees => Pitch * RAD_TO_DEG;
-    public float RollDegrees => Roll * RAD_TO_DEG;
+    public readonly float YawDegrees => Yaw * RAD_TO_DEG;
+    public readonly float PitchDegrees => Pitch * RAD_TO_DEG;
+    public readonly float RollDegrees => Roll * RAD_TO_DEG;
 
-    public float X => Pitch;
-    public float Y => Yaw;
-    public float Z => Roll;
+    public readonly float X => Pitch;
+    public readonly float Y => Yaw;
+    public readonly float Z => Roll;
 
-    public float XDegrees => Pitch * RAD_TO_DEG;
-    public float YDegrees => Yaw * RAD_TO_DEG;
-    public float ZDegrees => Roll * RAD_TO_DEG;
+    public readonly float XDegrees => Pitch * RAD_TO_DEG;
+    public readonly float YDegrees => Yaw * RAD_TO_DEG;
+    public readonly float ZDegrees => Roll * RAD_TO_DEG;
 
     public static EulerAngles CreateFromDegrees(float yaw, float pitch, float roll)
     {

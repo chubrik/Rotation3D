@@ -1,15 +1,13 @@
-﻿namespace Trigonometry;
+﻿namespace Rotation3D;
 
 using System.Numerics;
 using static System.MathF;
 
-public static class AxisAngleExtensions
+public static class AxisAngleFormulas
 {
-    [Obsolete("Not tested.")]
     public static Matrix4x4 ToMatrix(this AxisAngle axisAngle)
     {
-        // Reference:
-        // return Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
+        // Reference: Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
         var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
 
@@ -44,11 +42,9 @@ public static class AxisAngleExtensions
         return new Matrix4x4(m11, m12, m13, 0f, m21, m22, m23, 0f, m31, m32, m33, 0f, 0f, 0f, 0f, 1f);
     }
 
-    [Obsolete("Not tested.")]
     public static Quaternion ToQuaternion(this AxisAngle axisAngle)
     {
-        // Reference:
-        // return Quaternion.CreateFromAxisAngle(axisAngle.Axis.Normalize(), axisAngle.Angle);
+        // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis.Normalize(), axisAngle.Angle);
 
         var normAxis = axisAngle.Axis.Normalize(); // Vector must be normalized
         var (x, y, z, angle) = (normAxis.X, normAxis.Y, normAxis.Z, axisAngle.Angle);
@@ -63,7 +59,6 @@ public static class AxisAngleExtensions
         return new Quaternion(qX, qY, qZ, qW);
     }
 
-    [Obsolete("Not implemented.")]
     public static EulerAngles ToEulerAngles(this AxisAngle axisAngle)
     {
         throw new NotImplementedException();
@@ -72,13 +67,5 @@ public static class AxisAngleExtensions
     public static AxisAngle Normalize(this AxisAngle axisAngle)
     {
         return new AxisAngle(axisAngle.Axis.Normalize(), axisAngle.Angle);
-    }
-
-    /// <summary>
-    /// For debug only
-    /// </summary>
-    public static bool IsUnit(this AxisAngle axisAngle)
-    {
-        return axisAngle.Axis.IsUnit();
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Trigonometry;
+﻿namespace Rotation3D;
 
+using Rotation3D.Debugging;
 using System.Diagnostics;
 using System.Numerics;
 using static Constants;
 using static MathF;
 
-public static class Matrix4x4Extensions
+public static class Matrix4x4Formulas
 {
     public static Quaternion ToQuaternion(this Matrix4x4 matrix)
     {
-        // Reference:
-        // return Quaternion.CreateFromRotationMatrix(matrix);
+        // Reference: Quaternion.CreateFromRotationMatrix(matrix);
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);
@@ -54,12 +54,11 @@ public static class Matrix4x4Extensions
         return new Quaternion(qX, qY, qZ, qW);
     }
 
-    public static EulerAngles ToEulerAngles_UnitMatrix(this Matrix4x4 matrix)
+    public static EulerAngles ToEulerAngles(this Matrix4x4 matrix)
     {
         #region Explanations
 
-        // Reference:
-        // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/
+        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/
         //
         // /** this conversion uses conventions as described on page:
         // *   https://www.euclideanspace.com/maths/geometry/rotations/euler/index.htm
@@ -94,7 +93,7 @@ public static class Matrix4x4Extensions
         // 1. Flip matrix:  [21  22  23] => [-32  22 -12]
         //                  [31  32  33]    [-31 -21  11]
         //
-        // 2. 0.998 => 0.9998477 (1° from pole)
+        // 2. 0.998 => SIN_89 (1° from pole)
         // 3. Keep pitch in poles
 
         #endregion
@@ -106,16 +105,16 @@ public static class Matrix4x4Extensions
 
         float yaw, pitch, roll;
 
-        if (m32 < -0.9998477f)
+        if (m32 < SIN_MINUS_89)
         {
             yaw = Atan2(-m13, m11);
-            pitch = m32 > -1 ? Asin(-m32) : POSITIVE_HALF_PI;
+            pitch = m32 > -1 ? Asin(-m32) : HALF_PI;
             roll = 0f;
         }
-        else if (m32 > 0.9998477f)
+        else if (m32 > SIN_89)
         {
             yaw = Atan2(-m13, m11);
-            pitch = m32 < 1 ? Asin(-m32) : NEGATIVE_HALF_PI;
+            pitch = m32 < 1 ? Asin(-m32) : MINUS_HALF_PI;
             roll = 0f;
         }
         else
@@ -140,16 +139,16 @@ public static class Matrix4x4Extensions
         var normM32 = m32 / Sqrt(m12 * m12 + m22 * m22 + m32 * m32);
         float yaw, pitch, roll;
 
-        if (normM32 < -0.9998477f)
+        if (normM32 < SIN_MINUS_89)
         {
             yaw = Atan2(-m13, m11);
-            pitch = normM32 > -1 ? Asin(-normM32) : POSITIVE_HALF_PI;
+            pitch = normM32 > -1 ? Asin(-normM32) : HALF_PI;
             roll = 0f;
         }
-        else if (normM32 > 0.9998477f)
+        else if (normM32 > SIN_89)
         {
             yaw = Atan2(-m13, m11);
-            pitch = normM32 < 1 ? Asin(-normM32) : NEGATIVE_HALF_PI;
+            pitch = normM32 < 1 ? Asin(-normM32) : MINUS_HALF_PI;
             roll = 0f;
         }
         else
@@ -162,33 +161,8 @@ public static class Matrix4x4Extensions
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    [Obsolete("Not implemented.")]
     public static AxisAngle ToAxisAngle(this Matrix4x4 matrix)
     {
         throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// For debug only
-    /// </summary>
-    private static bool IsUnit(this Matrix4x4 matrix)
-    {
-        Matrix4x4.Decompose(matrix, out var scale, out _, out _);
-
-        return Abs(scale.X - 1f) < 0.00000012f &&
-               Abs(scale.Y - 1f) < 0.00000012f &&
-               Abs(scale.Z - 1f) < 0.00000012f;
-    }
-
-    /// <summary>
-    /// For debug only
-    /// </summary>
-    private static bool HasUniformScale(this Matrix4x4 matrix)
-    {
-        Matrix4x4.Decompose(matrix, out var scale, out _, out _);
-
-        return Abs(scale.X - scale.Y) < 0.00000024f &&
-               Abs(scale.Y - scale.Z) < 0.00000024f &&
-               Abs(scale.Z - scale.X) < 0.00000024f;
     }
 }

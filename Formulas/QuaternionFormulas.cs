@@ -1,16 +1,16 @@
-﻿namespace Trigonometry;
+﻿namespace Rotation3D;
 
+using Rotation3D.Debugging;
 using System.Diagnostics;
 using System.Numerics;
 using static Constants;
 using static MathF;
 
-public static class QuaternionExtensions
+public static class QuaternionFormulas
 {
     public static Matrix4x4 ToMatrix(this Quaternion quaternion)
     {
-        // Reference:
-        // return Matrix4x4.CreateFromQuaternion(quaternion);
+        // Reference: Matrix4x4.CreateFromQuaternion(quaternion);
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
@@ -39,12 +39,11 @@ public static class QuaternionExtensions
         return new Matrix4x4(m11, m12, m13, 0f, m21, m22, m23, 0f, m31, m32, m33, 0f, 0f, 0f, 0f, 1f);
     }
 
-    public static EulerAngles ToEulerAngles_UnitQuaternion(this Quaternion quaternion)
+    public static EulerAngles ToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
 
-        // Reference:
-        // https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
         //
         // /** assumes q1 is a normalised quaternion */
         //
@@ -72,7 +71,7 @@ public static class QuaternionExtensions
 
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
-        // 2. 0.499 => 0.9998477 (1° from pole)
+        // 2. 0.499 => SIN_89 (1° from pole)
         // 3. Fix yaw in poles
         // 4. Keep pitch in poles
         // 5. Atan2 reductions
@@ -86,16 +85,16 @@ public static class QuaternionExtensions
         var sinPitch = (x * w - y * z) * 2f;
         float yaw, pitch, roll;
 
-        if (sinPitch > 0.9998477f)
+        if (sinPitch > SIN_89)
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
-            pitch = sinPitch < 1 ? Asin(sinPitch) : POSITIVE_HALF_PI;
+            pitch = sinPitch < 1 ? Asin(sinPitch) : HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < -0.9998477f)
+        else if (sinPitch < SIN_MINUS_89)
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
-            pitch = sinPitch > -1 ? Asin(sinPitch) : NEGATIVE_HALF_PI;
+            pitch = sinPitch > -1 ? Asin(sinPitch) : MINUS_HALF_PI;
             roll = 0f;
         }
         else
@@ -109,12 +108,11 @@ public static class QuaternionExtensions
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static EulerAngles ToEulerAngles_NotUnitQuaternion(this Quaternion quaternion)
+    public static EulerAngles ToEulerAngles_NonUnitQuaternion(this Quaternion quaternion)
     {
         #region Explanations
 
-        // Reference:
-        // https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
         //
         // /** q1 can be non-normalised quaternion */
         // 
@@ -144,7 +142,7 @@ public static class QuaternionExtensions
 
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
-        // 2. 0.499 => 0.9998477 (1° from pole)
+        // 2. 0.499 => SIN_89 (1° from pole)
         // 3. Fix yaw in poles
         // 4. Keep pitch in poles
 
@@ -160,16 +158,16 @@ public static class QuaternionExtensions
         var normSinPitch = (x * w - y * z) * 2f / (xx + yy + zz + ww);
         float yaw, pitch, roll;
 
-        if (normSinPitch > 0.9998477f)
+        if (normSinPitch > SIN_89)
         {
             yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
-            pitch = normSinPitch < 1 ? Asin(normSinPitch) : POSITIVE_HALF_PI;
+            pitch = normSinPitch < 1 ? Asin(normSinPitch) : HALF_PI;
             roll = 0f;
         }
-        else if (normSinPitch < -0.9998477f)
+        else if (normSinPitch < SIN_MINUS_89)
         {
             yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
-            pitch = normSinPitch > -1 ? Asin(normSinPitch) : NEGATIVE_HALF_PI;
+            pitch = normSinPitch > -1 ? Asin(normSinPitch) : MINUS_HALF_PI;
             roll = 0f;
         }
         else
@@ -182,28 +180,26 @@ public static class QuaternionExtensions
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    [Obsolete("Not tested.")]
     public static AxisAngle ToAxisAngle(this Quaternion quaternion)
     {
         #region Explanations
 
-        // Reference:
-        // https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/
+        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/
         //
-        //  public void set(Quat4d q1) {
-        //    if (q1.w > 1) q1.normalise(); // if w>1 acos and sqrt will produce errors, this cant happen if quaternion is normalised
-        //    angle = 2 * Math.acos(q1.w);
-        //    double s = Math.sqrt(1-q1.w*q1.w); // assuming quaternion normalised then w is less than 1, so term always positive.
-        //    if (s < 0.001) { // test to avoid divide by zero, s is always positive due to sqrt
-        //      // if s close to zero then direction of axis not important
-        //      x = q1.x; // if it is important that axis is normalised then replace with x=1; y=z=0;
-        //      y = q1.y;
-        //      z = q1.z;
-        //    } else {
-        //      x = q1.x / s; // normalise axis
-        //      y = q1.y / s;
-        //      z = q1.z / s;
-        //    }
+        // public void set(Quat4d q1) {
+        //     if (q1.w > 1) q1.normalise(); // if w>1 acos and sqrt will produce errors, this cant happen if quaternion is normalised
+        //     angle = 2 * Math.acos(q1.w);
+        //     double s = Math.sqrt(1-q1.w*q1.w); // assuming quaternion normalised then w is less than 1, so term always positive.
+        //     if (s < 0.001) { // test to avoid divide by zero, s is always positive due to sqrt
+        //         // if s close to zero then direction of axis not important
+        //         x = q1.x; // if it is important that axis is normalised then replace with x=1; y=z=0;
+        //         y = q1.y;
+        //         z = q1.z;
+        //     } else {
+        //         x = q1.x / s; // normalise axis
+        //         y = q1.y / s;
+        //         z = q1.z / s;
+        //     }
         // }
 
         #endregion
@@ -236,22 +232,11 @@ public static class QuaternionExtensions
 
     public static Quaternion Normalize(this Quaternion quaternion)
     {
-        // Reference:
-        // return Quaternion.Normalize(quaternion);
+        // Reference: Quaternion.Normalize(quaternion);
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var invNorm = 1f / Sqrt(x * x + y * y + z * z + w * w);
         return new Quaternion(x * invNorm, y * invNorm, z * invNorm, w * invNorm);
-    }
-
-    /// <summary>
-    /// For debug only
-    /// </summary>
-    public static bool IsUnit(this Quaternion quaternion)
-    {
-        var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
-
-        return Abs(x * x + y * y + z * z + w * w - 1) <= 0.00000048f;
     }
 }
