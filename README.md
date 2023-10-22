@@ -9,7 +9,7 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
-| **AxisAngle** | &nbsp;– | ❌ Soon | ✅ Tested | ✅ Tested |
+| **AxisAngle** | &nbsp;– | ✅ Tested | ✅ Tested | ✅ Tested |
 | **EulerAngles** | ❌ Soon | &nbsp;– | ✅ Tested | ✅ Tested |
 | **Matrix4x4** | ❌ Soon | ✅ Tested | &nbsp;– | ✅ Tested |
 | **Quaternion** | ⚠️ Draft | ✅ Tested | ✅ Tested | &nbsp;– |

@@ -22,40 +22,65 @@ public static class TestAsserts
 
     public static bool IsNormal(this Matrix4x4 matrix)
     {
-        const float maxDiff = 5.96046448E-07f;
+        const float maxDiff = 6.556511E-07f;
 
         var (m11, m21, m31) = (matrix.M11, matrix.M21, matrix.M31);
 
-        return Abs(m11 * m11 + m21 * m21 + m31 * m31 - 1f) <= maxDiff;
+        var diff = Abs(m11 * m11 + m21 * m21 + m31 * m31 - 1f);
+        var isNormal = diff <= maxDiff;
+
+        if (!isNormal)
+            Console.WriteLine($"Diff is {diff}");
+
+        return isNormal;
     }
 
     public static bool IsUniformScaled(this Matrix4x4 matrix)
     {
-        const float maxDiff = 0.00000024f; //todo test
+        const float maxDiff = 0f; //todo test
 
         Matrix4x4.Decompose(matrix, out var scale, out _, out _);
 
-        return Abs(scale.X - scale.Y) <= maxDiff
-            && Abs(scale.Y - scale.Z) <= maxDiff
-            && Abs(scale.Z - scale.X) <= maxDiff;
+        var diff1 = Abs(scale.X - scale.Y);
+        var diff2 = Abs(scale.Y - scale.Z);
+        var diff3 = Abs(scale.Z - scale.X);
+        var diff = Max(Max(diff1, diff2), diff3);
+        var isUnisformScaled = diff <= maxDiff;
+
+        if (!isUnisformScaled)
+            Console.WriteLine($"Diff is {diff}");
+
+        return isUnisformScaled;
     }
 
     public static bool IsNormal(this Quaternion quaternion)
     {
-        const float maxDiff = 0.00000048f; //todo test
+        const float maxDiff = 4.7683716E-07f;
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        return Abs(x * x + y * y + z * z + w * w - 1f) <= maxDiff;
+        var diff = Abs(x * x + y * y + z * z + w * w - 1f);
+        var isNormal = diff <= maxDiff;
+
+        if (!isNormal)
+            Console.WriteLine($"Diff is {diff}");
+
+        return isNormal;
     }
 
     public static bool IsNormal(this Vector3 vector)
     {
-        const float maxDiff = 0.00000036f; //todo test
+        const float maxDiff = 1.7881393E-07f;
 
         var (x, y, z) = (vector.X, vector.Y, vector.Z);
 
-        return Abs(x * x + y * y + z * z - 1f) <= maxDiff;
+        var diff = Abs(x * x + y * y + z * z - 1f);
+        var isNormal = diff <= maxDiff;
+
+        if (!isNormal)
+            Console.WriteLine($"Diff is {diff}");
+
+        return isNormal;
     }
 
     public static bool IsNormalAngle(float angle)

@@ -1,11 +1,12 @@
 ﻿namespace Rotation3D.Tests;
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Numerics;
 
 public abstract class TestsBase
 {
-    protected const int _iterationCount = 10_000_000;
+    protected const int _iterationCount = 100_000_000;
 
     private const double DOUBLE_TWO_PI = Math.PI * 2.0;
     private const double DOUBLE_HALF_PI = Math.PI / 2.0;
@@ -24,6 +25,7 @@ public abstract class TestsBase
 
         var angle = (float)(_random.NextDouble() * DOUBLE_TWO_PI - Math.PI);
         var axisAngle = new AxisAngle(normX, normY, normZ, angle);
+        Assert.IsTrue(axisAngle.IsNormal());
         return axisAngle;
     }
 
@@ -34,6 +36,7 @@ public abstract class TestsBase
         var roll = (float)(_random.NextDouble() * DOUBLE_TWO_PI - Math.PI);
 
         var eulerAngles = new EulerAngles(yaw, pitch, roll);
+        Assert.IsTrue(eulerAngles.IsNormal());
         return eulerAngles;
     }
 
@@ -54,7 +57,7 @@ public abstract class TestsBase
         double quaternionZ = rawZ * invNorm;
         double quaternionW = rawW * invNorm;
 
-        Matrix4x4 result = Matrix4x4.Identity;
+        Matrix4x4 matrix = Matrix4x4.Identity;
 
         double xx = quaternionX * quaternionX;
         double yy = quaternionY * quaternionY;
@@ -67,19 +70,20 @@ public abstract class TestsBase
         double yz = quaternionY * quaternionZ;
         double wx = quaternionX * quaternionW;
 
-        result.M11 = (float)(1.0 - 2.0 * (yy + zz));
-        result.M12 = (float)(2.0 * (xy + wz));
-        result.M13 = (float)(2.0 * (xz - wy));
+        matrix.M11 = (float)(1.0 - 2.0 * (yy + zz));
+        matrix.M12 = (float)(2.0 * (xy + wz));
+        matrix.M13 = (float)(2.0 * (xz - wy));
 
-        result.M21 = (float)(2.0 * (xy - wz));
-        result.M22 = (float)(1.0 - 2.0 * (zz + xx));
-        result.M23 = (float)(2.0 * (yz + wx));
+        matrix.M21 = (float)(2.0 * (xy - wz));
+        matrix.M22 = (float)(1.0 - 2.0 * (zz + xx));
+        matrix.M23 = (float)(2.0 * (yz + wx));
 
-        result.M31 = (float)(2.0 * (xz + wy));
-        result.M32 = (float)(2.0 * (yz - wx));
-        result.M33 = (float)(1.0 - 2.0 * (yy + xx));
+        matrix.M31 = (float)(2.0 * (xz + wy));
+        matrix.M32 = (float)(2.0 * (yz - wx));
+        matrix.M33 = (float)(1.0 - 2.0 * (yy + xx));
 
-        return result;
+        Assert.IsTrue(matrix.IsNormal());
+        return matrix;
     }
 
     protected static Quaternion GetRandomNormalQuaternion()
@@ -96,6 +100,7 @@ public abstract class TestsBase
         var normW = (float)(rawW * invNorm);
 
         var quaternion = new Quaternion(normX, normY, normZ, normW);
+        Assert.IsTrue(quaternion.IsNormal());
         return quaternion;
     }
 

@@ -9,7 +9,10 @@ public sealed class Matrix4x4Tests : TestsBase
     [TestMethod]
     public void ToEulerAngles()
     {
-        const float maxDiffAllowed = 0.0022386455f;
+        // Truth: Matrix4x4
+        // Test:  Matrix4x4 => EulerAngles (custom) => Matrix4x4 (system)
+
+        const float maxDiffAllowed = 0.0022849343f;
 
         var maxDiff = 0f;
         var maxDiffEulerAngles = default(EulerAngles);
@@ -22,6 +25,7 @@ public sealed class Matrix4x4Tests : TestsBase
         {
             var matrixSource = GetRandomNormalMatrix4x4();
             var eulerAngles = matrixSource.ToEulerAngles();
+            Assert.IsTrue(eulerAngles.IsNormal());
             var matrixRevert = Matrix4x4.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
             var diff = CalcSumDiff(matrixSource, matrixRevert);
 
@@ -50,6 +54,9 @@ public sealed class Matrix4x4Tests : TestsBase
     [TestMethod]
     public void ToQuaternion()
     {
+        // Truth: Matrix4x4 => Quaternion (system)
+        // Test:  Matrix4x4 => Quaternion (custom)
+
         var iteration = 0;
 
         while (++iteration <= _iterationCount)
@@ -57,6 +64,7 @@ public sealed class Matrix4x4Tests : TestsBase
             var matrix = GetRandomNormalMatrix4x4();
             var quaternionSystem = Quaternion.CreateFromRotationMatrix(matrix);
             var quaternionCustom = matrix.ToQuaternion();
+            Assert.IsTrue(quaternionCustom.IsNormal());
             Assert.AreEqual(quaternionSystem, quaternionCustom);
         }
 

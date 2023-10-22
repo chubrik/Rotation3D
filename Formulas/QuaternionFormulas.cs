@@ -99,8 +99,7 @@ public static class QuaternionFormulas
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
         // 2. 0.499 => 0.499999821 (0.05° from pole)
-        // 3. Fix yaw in poles
-        // 4. Atan2 reductions
+        // 3. Fix yaw in poles: Atan2(-m13, m11)
 
         #endregion
 
@@ -168,7 +167,7 @@ public static class QuaternionFormulas
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
         // 2. 0.499 => 0.499999821 (0.05° from pole)
-        // 3. Fix yaw in poles
+        // 3. Fix yaw in poles: Atan2(-m13, m11)
 
         #endregion
 
