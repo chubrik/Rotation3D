@@ -183,13 +183,13 @@ public static class QuaternionFormulas
 
         if (normHalfSinPitch > HALF_SIN_NEAR_90)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
+            yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
             pitch = HALF_PI;
             roll = 0f;
         }
         else if (normHalfSinPitch < MINUS_HALF_SIN_NEAR_90)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
+            yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
             pitch = MINUS_HALF_PI;
             roll = 0f;
         }

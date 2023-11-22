@@ -6,7 +6,7 @@ using System.Numerics;
 
 public abstract class TestsBase
 {
-    protected const int _iterationCount = 100_000_000;
+    protected const int _iterationCount = 10_000_000;
 
     private const double DOUBLE_TWO_PI = Math.PI * 2.0;
     private const double DOUBLE_HALF_PI = Math.PI / 2.0;

@@ -82,23 +82,21 @@ public static class Matrix4x4Formulas
 
     public static EulerAngles ToEulerAngles_ScaledMatrix(this Matrix4x4 matrix)
     {
-        // Similar to the previous one, but supports a uniformly scaled matrix.
+        // Similar to the previous one, but supports a scaled matrix.
 
-        Assert.IsTrue(matrix.IsUniformScaled());
+        var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+            (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);
 
-        var (m11, m12, m13, m22, m31, m32, m33) =
-            (matrix.M11, matrix.M12, matrix.M13, matrix.M22, matrix.M31, matrix.M32, matrix.M33);
-
-        var normM32 = m32 / Sqrt(m12 * m12 + m22 * m22 + m32 * m32);
+        var sinPitch = -m32 / Sqrt(m31 * m31 + m32 * m32 + m33 * m33); // backward length
         float yaw, pitch, roll;
 
-        if (normM32 < MINUS_SIN_NEAR_90)
+        if (sinPitch > SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
             pitch = HALF_PI;
             roll = 0f;
         }
-        else if (normM32 > SIN_NEAR_90)
+        else if (sinPitch < MINUS_SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
             pitch = MINUS_HALF_PI;
@@ -107,8 +105,12 @@ public static class Matrix4x4Formulas
         else
         {
             yaw = Atan2(m31, m33);
-            pitch = Asin(-normM32);
-            roll = Atan2(m12, m22);
+            pitch = Asin(sinPitch);
+
+            roll = Atan2(
+                m12 / Sqrt(m11 * m11 + m12 * m12 + m13 * m13), // right length
+                m22 / Sqrt(m21 * m21 + m22 * m22 + m23 * m23)  // up length
+            );
         }
 
         return new EulerAngles(yaw, pitch, roll);
