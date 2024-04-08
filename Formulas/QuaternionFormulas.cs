@@ -178,25 +178,25 @@ public static class QuaternionFormulas
         var zz = z * z;
         var ww = w * w;
 
-        var normHalfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
+        var halfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
         float yaw, pitch, roll;
 
-        if (normHalfSinPitch > HALF_SIN_NEAR_90)
+        if (halfSinPitch > HALF_SIN_NEAR_90)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
+            yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
             pitch = HALF_PI;
             roll = 0f;
         }
-        else if (normHalfSinPitch < MINUS_HALF_SIN_NEAR_90)
+        else if (halfSinPitch < MINUS_HALF_SIN_NEAR_90)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - yy - zz);
+            yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
             pitch = MINUS_HALF_PI;
             roll = 0f;
         }
         else
         {
             yaw = Atan2((x * z + y * w) * 2f, ww - xx - yy + zz);
-            pitch = Asin(normHalfSinPitch * 2f);
+            pitch = Asin(halfSinPitch * 2f);
             roll = Atan2((x * y + z * w) * 2f, ww - xx + yy - zz);
         }
 
@@ -234,6 +234,80 @@ public static class QuaternionFormulas
         matrix.M31 = (xz + yw) * 2f;
         matrix.M32 = (yz - xw) * 2f;
         matrix.M33 = 1f - (xx + yy) * 2f;
+
+        return matrix;
+    }
+
+    public static Matrix4x4 ToMatrix4x4_NonUnitQuaternion(this Quaternion quaternion)
+    {
+        #region Explanations
+
+        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
+        //
+        // public final void quatToMatrix(Quat4d q){
+        //     double sqw = q.w*q.w;
+        //     double sqx = q.x*q.x;
+        //     double sqy = q.y*q.y;
+        //     double sqz = q.z*q.z;
+        // 
+        //     // invs (inverse square length) is only required if quaternion is not already normalised
+        //     double invs = 1 / (sqx + sqy + sqz + sqw)
+        //     m00 = ( sqx - sqy - sqz + sqw)*invs ; // since sqw + sqx + sqy + sqz =1/invs*invs
+        //     m11 = (-sqx + sqy - sqz + sqw)*invs ;
+        //     m22 = (-sqx - sqy + sqz + sqw)*invs ;
+        //     
+        //     double tmp1 = q.x*q.y;
+        //     double tmp2 = q.z*q.w;
+        //     m10 = 2.0 * (tmp1 + tmp2)*invs ;
+        //     m01 = 2.0 * (tmp1 - tmp2)*invs ;
+        //     
+        //     tmp1 = q.x*q.z;
+        //     tmp2 = q.y*q.w;
+        //     m20 = 2.0 * (tmp1 - tmp2)*invs ;
+        //     m02 = 2.0 * (tmp1 + tmp2)*invs ;
+        //     tmp1 = q.y*q.z;
+        //     tmp2 = q.x*q.w;
+        //     m21 = 2.0 * (tmp1 + tmp2)*invs ;
+        //     m12 = 2.0 * (tmp1 - tmp2)*invs ;
+        // }
+
+        // Change:
+        //               [00  01  02]    [11  21  31]
+        // Flip matrix:  [10  11  12] => [12  22  32]
+        //               [20  21  22]    [13  23  33]
+
+        #endregion
+
+        var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
+
+        var xx = x * x;
+        var yy = y * y;
+        var zz = z * z;
+        var ww = w * w;
+
+        var xy = x * y;
+        var xz = x * z;
+        var xw = x * w;
+        var yz = y * z;
+        var yw = y * w;
+        var zw = z * w;
+
+        var invS = 1f / (xx + yy + zz + ww);
+        var invSx2 = invS * 2f;
+
+        var matrix = Matrix4x4.Identity;
+
+        matrix.M11 = (ww + xx - yy - zz) * invS;
+        matrix.M12 = (xy + zw) * invSx2;
+        matrix.M13 = (xz - yw) * invSx2;
+
+        matrix.M21 = (xy - zw) * invSx2;
+        matrix.M22 = (ww - xx + yy - zz) * invS;
+        matrix.M23 = (xw + yz) * invSx2;
+
+        matrix.M31 = (xz + yw) * invSx2;
+        matrix.M32 = (yz - xw) * invSx2;
+        matrix.M33 = (ww - xx - yy + zz) * invS;
 
         return matrix;
     }

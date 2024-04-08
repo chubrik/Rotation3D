@@ -10,8 +10,8 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
 | **AxisAngle** | &nbsp;– | ✅ Tested | ✅ Tested | ✅ Tested |
-| **EulerAngles** | ❌ Soon | &nbsp;– | ✅ Tested | ✅ Tested |
-| **Matrix4x4** | ❌ Soon | ✅ Tested | &nbsp;– | ✅ Tested |
+| **EulerAngles** | ❌ Not yet | &nbsp;– | ✅ Tested | ✅ Tested |
+| **Matrix4x4** | ❌ Not yet | ✅ Tested | &nbsp;– | ✅ Tested |
 | **Quaternion** | ⚠️ Draft | ✅ Tested | ✅ Tested | &nbsp;– |
 
 <br>
@@ -20,7 +20,7 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
-| **AxisAngle** | &nbsp;– | ❌ Soon | ⚠️ Not tested | ❌ Soon |
-| **EulerAngles** | ❌ Soon | &nbsp;– | ⚠️ Not tested | ⚠️ Not tested |
-| **Matrix4x4** | ❌ Soon | ⚠️ Not tested | &nbsp;– | ⚠️ Not tested |
-| **Quaternion** | ⚠️ Draft | ⚠️ Not tested | ⚠️ Not tested | &nbsp;– |
+| **AxisAngle** | &nbsp;– | ❌ Not yet | ❌ Not yet | ❌ Not yet |
+| **EulerAngles** | &nbsp;– | &nbsp;– | &nbsp;– | &nbsp;– |
+| **Matrix4x4** | ❌ Not yet | ⚠️ Not best | &nbsp;– | ❌ Not yet |
+| **Quaternion** | ❌ Not yet | ✅ Tested | ✅ Tested | &nbsp;– |

@@ -42,6 +42,22 @@ public abstract class TestsBase
 
     protected static Matrix4x4 GetRandomNormalMatrix4x4()
     {
+        var matrix = GetRandomMatrix4x4(scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0);
+        Assert.IsTrue(matrix.IsNormal());
+        return matrix;
+    }
+
+    protected static Matrix4x4 GetRandomScaledMatrix4x4()
+    {
+        var scaleX = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
+        var scaleY = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
+        var scaleZ = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
+        var matrix = GetRandomMatrix4x4(scaleX: scaleX, scaleY: scaleY, scaleZ: scaleZ);
+        return matrix;
+    }
+
+    private static Matrix4x4 GetRandomMatrix4x4(double scaleX, double scaleY, double scaleZ)
+    {
         // Creating a normal quaternion and converting it to a matrix.
         // The Convertion implementaion is similar to: Matrix4x4.CreateFromQuaternion(Quaternion quaternion)
         // but on doubles to prevent float quantization violations.
@@ -70,19 +86,18 @@ public abstract class TestsBase
         double yz = quaternionY * quaternionZ;
         double wx = quaternionX * quaternionW;
 
-        matrix.M11 = (float)(1.0 - 2.0 * (yy + zz));
-        matrix.M12 = (float)(2.0 * (xy + wz));
-        matrix.M13 = (float)(2.0 * (xz - wy));
+        matrix.M11 = (float)(scaleX * (1.0 - 2.0 * (yy + zz)));
+        matrix.M12 = (float)(scaleX * (2.0 * (xy + wz)));
+        matrix.M13 = (float)(scaleX * (2.0 * (xz - wy)));
 
-        matrix.M21 = (float)(2.0 * (xy - wz));
-        matrix.M22 = (float)(1.0 - 2.0 * (zz + xx));
-        matrix.M23 = (float)(2.0 * (yz + wx));
+        matrix.M21 = (float)(scaleY * (2.0 * (xy - wz)));
+        matrix.M22 = (float)(scaleY * (1.0 - 2.0 * (zz + xx)));
+        matrix.M23 = (float)(scaleY * (2.0 * (yz + wx)));
 
-        matrix.M31 = (float)(2.0 * (xz + wy));
-        matrix.M32 = (float)(2.0 * (yz - wx));
-        matrix.M33 = (float)(1.0 - 2.0 * (yy + xx));
+        matrix.M31 = (float)(scaleZ * (2.0 * (xz + wy)));
+        matrix.M32 = (float)(scaleZ * (2.0 * (yz - wx)));
+        matrix.M33 = (float)(scaleZ * (1.0 - 2.0 * (yy + xx)));
 
-        Assert.IsTrue(matrix.IsNormal());
         return matrix;
     }
 
@@ -101,6 +116,25 @@ public abstract class TestsBase
 
         var quaternion = new Quaternion(normX, normY, normZ, normW);
         Assert.IsTrue(quaternion.IsNormal());
+        return quaternion;
+    }
+
+    protected static Quaternion GetRandomNonUnitQuaternion()
+    {
+        var rawX = _random.NextDouble() * 2.0 - 1.0;
+        var rawY = _random.NextDouble() * 2.0 - 1.0;
+        var rawZ = _random.NextDouble() * 2.0 - 1.0;
+        var rawW = _random.NextDouble() * 2.0 - 1.0;
+
+        var invNorm = 1 / Math.Sqrt(rawX * rawX + rawY * rawY + rawZ * rawZ + rawW * rawW);
+        var scale = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
+
+        var x = (float)(rawX * invNorm * scale);
+        var y = (float)(rawY * invNorm * scale);
+        var z = (float)(rawZ * invNorm * scale);
+        var w = (float)(rawW * invNorm * scale);
+
+        var quaternion = new Quaternion(x, y, z, w);
         return quaternion;
     }
 

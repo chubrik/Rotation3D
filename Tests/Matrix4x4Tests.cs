@@ -52,6 +52,57 @@ public sealed class Matrix4x4Tests : TestsBase
     }
 
     [TestMethod]
+    public void ToEulerAngles_NonUnit()
+    {
+        // Truth: Matrix4x4_NonUnit => Quaternion (system)
+        // Test:  Matrix4x4_NonUnit => EulerAngles (custom) => Quaternion (system)
+
+        const float maxDiffAllowed = 0.0008904189f;
+
+        var maxDiff = 0f;
+        var maxDiffMatrix = default(Matrix4x4);
+        var maxDiffEulerAngles = default(EulerAngles);
+        var maxDiffQuaternionCustom = default(Quaternion);
+        var maxDiffQuaternionSystem = default(Quaternion);
+
+        var iteration = 0;
+
+        while (++iteration <= _iterationCount)
+        {
+            var matrix = GetRandomScaledMatrix4x4();
+            var eulerAngles = matrix.ToEulerAngles_ScaledMatrix();
+            var quaternionCustom = Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
+            Matrix4x4.Decompose(matrix, out _, out var quaternionSystem, out _);
+            Assert.IsTrue(eulerAngles.IsNormal());
+            Assert.IsTrue(quaternionCustom.IsNormal());
+            Assert.IsTrue(quaternionSystem.IsNormal());
+            var diff = CalcSumDiff(quaternionCustom, quaternionSystem);
+
+            if (maxDiff < diff)
+            {
+                maxDiff = diff;
+                maxDiffMatrix = matrix;
+                maxDiffEulerAngles = eulerAngles;
+                maxDiffQuaternionCustom = quaternionCustom;
+                maxDiffQuaternionSystem = quaternionSystem;
+            }
+        }
+
+        Console.WriteLine($"Max diff: {maxDiff}");
+
+        if (maxDiff > 0)
+        {
+            Console.WriteLine($"Matrix4x4: {maxDiffMatrix}");
+            Console.WriteLine($"EulerAngles: {maxDiffEulerAngles}");
+            Console.WriteLine($"Quaternion custom: {maxDiffQuaternionCustom}");
+            Console.WriteLine($"Quaternion system: {maxDiffQuaternionSystem}");
+
+            if (maxDiff > maxDiffAllowed)
+                Assert.Fail();
+        }
+    }
+
+    [TestMethod]
     public void ToQuaternion()
     {
         // Truth: Matrix4x4 => Quaternion (system)

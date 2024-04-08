@@ -22,11 +22,14 @@ public static class TestAsserts
 
     public static bool IsNormal(this Matrix4x4 matrix)
     {
-        const float maxDiff = 6.556511E-07f;
+        const float maxDiff = 3.5762787E-07f;
 
-        var (m11, m21, m31) = (matrix.M11, matrix.M21, matrix.M31);
+        Matrix4x4.Decompose(matrix, out var scale, out _, out _);
 
-        var diff = Abs(m11 * m11 + m21 * m21 + m31 * m31 - 1f);
+        var diffX = Abs(1f - scale.X);
+        var diffY = Abs(1f - scale.Y);
+        var diffZ = Abs(1f - scale.Z);
+        var diff = Max(Max(diffX, diffY), diffZ);
         var isNormal = diff <= maxDiff;
 
         if (!isNormal)
