@@ -1,28 +1,26 @@
 ﻿namespace Rotation3D;
 
-using static MathFConstants;
+using static Constants;
 
 // Reference:
 // https://www.euclideanspace.com/maths/geometry/rotations/euler/
 
-public struct EulerAngles
+public readonly struct EulerAngles
 {
     public static readonly EulerAngles Identity = default;
 
-    /// <summary>
-    /// Aka heading, azimuth, Y axis. Applied first.
-    /// </summary>
-    public float Yaw;
+    /// <summary>Aka heading, azimuth, Y axis. Applied first.</summary>
+    public readonly float Yaw;
 
-    /// <summary>
-    /// Aka attitude, elevation, X axis. Applied second.
-    /// </summary>
-    public float Pitch;
+    /// <summary>Aka attitude, elevation, X axis. Applied second.</summary>
+    public readonly float Pitch;
 
-    /// <summary>
-    /// Aka bank, tilt, Z axis. Applied last.
-    /// </summary>
-    public float Roll;
+    /// <summary>Aka bank, tilt, Z axis. Applied last.</summary>
+    public readonly float Roll;
+
+    public readonly float YawDegrees => Yaw * F_RAD_TO_DEG;
+    public readonly float PitchDegrees => Pitch * F_RAD_TO_DEG;
+    public readonly float RollDegrees => Roll * F_RAD_TO_DEG;
 
     public EulerAngles(float yaw, float pitch, float roll)
     {
@@ -31,31 +29,9 @@ public struct EulerAngles
         Roll = roll;
     }
 
-    public readonly float YawDegrees => Yaw * RAD_TO_DEG;
-    public readonly float PitchDegrees => Pitch * RAD_TO_DEG;
-    public readonly float RollDegrees => Roll * RAD_TO_DEG;
-
-    public readonly float X => Pitch;
-    public readonly float Y => Yaw;
-    public readonly float Z => Roll;
-
-    public readonly float XDegrees => Pitch * RAD_TO_DEG;
-    public readonly float YDegrees => Yaw * RAD_TO_DEG;
-    public readonly float ZDegrees => Roll * RAD_TO_DEG;
-
-    public static EulerAngles CreateFromDegrees(float yaw, float pitch, float roll)
+    public static EulerAngles FromDegrees(float yaw, float pitch, float roll)
     {
-        return new EulerAngles(yaw * DEG_TO_RAD, pitch * DEG_TO_RAD, roll * DEG_TO_RAD);
-    }
-
-    public static EulerAngles CreateFromXYZ(float x, float y, float z)
-    {
-        return new EulerAngles(yaw: y, pitch: x, roll: z);
-    }
-
-    public static EulerAngles CreateFromXYZDegrees(float x, float y, float z)
-    {
-        return new EulerAngles(yaw: y * DEG_TO_RAD, pitch: x * DEG_TO_RAD, roll: z * DEG_TO_RAD);
+        return new EulerAngles(yaw * F_DEG_TO_RAD, pitch * F_DEG_TO_RAD, roll * F_DEG_TO_RAD);
     }
 
     public override readonly string ToString()

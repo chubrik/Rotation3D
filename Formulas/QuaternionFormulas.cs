@@ -1,10 +1,9 @@
 ﻿namespace Rotation3D;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rotation3D.Tests;
+using System.Diagnostics;
 using System.Numerics;
+using static Constants;
 using static MathF;
-using static MathFConstants;
 
 public static class QuaternionFormulas
 {
@@ -14,11 +13,11 @@ public static class QuaternionFormulas
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        var invNorm = 1f / Sqrt(x * x + y * y + z * z + w * w);
-        return new Quaternion(x * invNorm, y * invNorm, z * invNorm, w * invNorm);
+        var invLen = 1f / Sqrt(x * x + y * y + z * z + w * w);
+        return new Quaternion(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 
-    public static AxisAngle ToAxisAngle(this Quaternion quaternion)
+    public static AxisAngle UnitToAxisAngle_Draft(this Quaternion quaternion)
     {
         #region Explanations
 
@@ -42,7 +41,7 @@ public static class QuaternionFormulas
 
         #endregion
 
-        Assert.IsTrue(quaternion.IsNormal());
+        Debug.Assert(quaternion.IsUnit());
         var (qX, qY, qZ, qW) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var angle = Acos(qW) * 2f;
@@ -66,7 +65,7 @@ public static class QuaternionFormulas
         return new AxisAngle(x, y, z, angle);
     }
 
-    public static EulerAngles ToEulerAngles(this Quaternion quaternion)
+    public static EulerAngles UnitToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
 
@@ -103,22 +102,22 @@ public static class QuaternionFormulas
 
         #endregion
 
-        Assert.IsTrue(quaternion.IsNormal());
+        Debug.Assert(quaternion.IsUnit());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var halfSinPitch = x * w - y * z;
         float yaw, pitch, roll;
 
-        if (halfSinPitch > HALF_SIN_NEAR_90)
+        if (halfSinPitch > F_HALF_SIN_NEAR_90)
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
-            pitch = HALF_PI;
+            pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (halfSinPitch < MINUS_HALF_SIN_NEAR_90)
+        else if (halfSinPitch < -F_HALF_SIN_NEAR_90)
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
-            pitch = MINUS_HALF_PI;
+            pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
@@ -132,7 +131,7 @@ public static class QuaternionFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static EulerAngles ToEulerAngles_NonUnitQuaternion(this Quaternion quaternion)
+    public static EulerAngles ScaledToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
 
@@ -181,16 +180,16 @@ public static class QuaternionFormulas
         var halfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
         float yaw, pitch, roll;
 
-        if (halfSinPitch > HALF_SIN_NEAR_90)
+        if (halfSinPitch > F_HALF_SIN_NEAR_90)
         {
             yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
-            pitch = HALF_PI;
+            pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (halfSinPitch < MINUS_HALF_SIN_NEAR_90)
+        else if (halfSinPitch < -F_HALF_SIN_NEAR_90)
         {
             yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
-            pitch = MINUS_HALF_PI;
+            pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
@@ -203,11 +202,11 @@ public static class QuaternionFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static Matrix4x4 ToMatrix4x4(this Quaternion quaternion)
+    public static Matrix4x4 UnitToMatrix(this Quaternion quaternion)
     {
         // Reference: Matrix4x4.CreateFromQuaternion(quaternion);
 
-        Assert.IsTrue(quaternion.IsNormal());
+        Debug.Assert(quaternion.IsUnit());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var xx = x * x;
@@ -238,7 +237,7 @@ public static class QuaternionFormulas
         return matrix;
     }
 
-    public static Matrix4x4 ToMatrix4x4_NonUnitQuaternion(this Quaternion quaternion)
+    public static Matrix4x4 ScaledToMatrix(this Quaternion quaternion)
     {
         #region Explanations
 

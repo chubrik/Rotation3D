@@ -1,9 +1,8 @@
 ﻿namespace Rotation3D;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rotation3D.Tests;
 using System.Numerics;
-using static MathFConstants;
+using static Constants;
+using static MathF;
 
 public static class CommonFormulas
 {
@@ -13,17 +12,14 @@ public static class CommonFormulas
 
         var (x, y, z) = (vector.X, vector.Y, vector.Z);
 
-        var invNorm = 1f / MathF.Sqrt(x * x + y * y + z * z);
-        return new Vector3(x * invNorm, y * invNorm, z * invNorm);
+        var invLen = 1f / Sqrt(x * x + y * y + z * z);
+        return new Vector3(x * invLen, y * invLen, z * invLen);
     }
 
-    public static float NormalizeAngle(float angle)
+    public static float NormalizeAngle(this float angle)
     {
-        var normAngle = angle < MINUS_PI ? angle + TWO_PI
-                      : angle > MathF.PI ? angle - TWO_PI
-                      : angle;
-
-        Assert.IsTrue(TestAsserts.IsNormalAngle(normAngle));
-        return normAngle;
+        return angle < -F_PI ? angle + F_TWO_PI
+            : angle > F_PI ? angle - F_TWO_PI
+            : angle;
     }
 }

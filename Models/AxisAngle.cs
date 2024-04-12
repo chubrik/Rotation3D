@@ -1,16 +1,19 @@
 ﻿namespace Rotation3D;
 
 using System.Numerics;
-using static MathFConstants;
+using static Constants;
 
-public struct AxisAngle
+public readonly struct AxisAngle
 {
-    private static readonly AxisAngle _identity = new(x: 1f, y: 0f, z: 0f, angle: 0f);
-    public static AxisAngle Identity => _identity;
+    public static AxisAngle Identity { get; } = new(x: 1f, y: 0f, z: 0f, angle: 0f);
 
-    public Vector3 Axis;
+    public readonly Vector3 Axis;
+    public readonly float Angle;
 
-    public float Angle;
+    public readonly float X => Axis.X;
+    public readonly float Y => Axis.Y;
+    public readonly float Z => Axis.Z;
+    public readonly float AngleDegrees => Angle * F_RAD_TO_DEG;
 
     public AxisAngle(Vector3 axis, float angle)
     {
@@ -19,25 +22,21 @@ public struct AxisAngle
     }
 
     public AxisAngle(float x, float y, float z, float angle)
+        : this(new Vector3(x, y, z), angle)
+    { }
+
+    public static AxisAngle FromDegrees(Vector3 axis, float angle)
     {
-        Axis = new Vector3(x, y, z);
-        Angle = angle;
+        return new AxisAngle(axis, angle * F_DEG_TO_RAD);
     }
 
-    public readonly float AngleDegrees => Angle * RAD_TO_DEG;
-
-    public static AxisAngle CreateFromDegrees(Vector3 axis, float angle)
+    public static AxisAngle FromDegrees(float x, float y, float z, float angle)
     {
-        return new AxisAngle(axis, angle * DEG_TO_RAD);
-    }
-
-    public static AxisAngle CreateFromDegrees(float x, float y, float z, float angle)
-    {
-        return new AxisAngle(x, y, z, angle * DEG_TO_RAD);
+        return new AxisAngle(x, y, z, angle * F_DEG_TO_RAD);
     }
 
     public override readonly string ToString()
     {
-        return $"{{X:{Axis.X} Y:{Axis.Y} Z:{Axis.Z} ANGLE:{Angle}}} {{ANGLE:{AngleDegrees}°}}";
+        return $"{{X:{X} Y:{Y} Z:{Z} ANGLE:{Angle}}} {{ANGLE:{AngleDegrees}°}}";
     }
 }

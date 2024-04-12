@@ -1,11 +1,9 @@
 ﻿namespace Rotation3D;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rotation3D.Tests;
+using System.Diagnostics;
 using System.Numerics;
-using static CommonFormulas;
+using static Constants;
 using static MathF;
-using static MathFConstants;
 
 public static class AxisAngleFormulas
 {
@@ -13,10 +11,10 @@ public static class AxisAngleFormulas
     {
         return new AxisAngle(
             axis: axisAngle.Axis.Normalize(),
-            angle: NormalizeAngle(axisAngle.Angle));
+            angle: axisAngle.Angle.NormalizeAngle());
     }
 
-    public static EulerAngles ToEulerAngles(this AxisAngle axisAngle)
+    public static EulerAngles UnitToEulerAngles(this AxisAngle axisAngle)
     {
         #region Explanations
 
@@ -56,8 +54,8 @@ public static class AxisAngleFormulas
 
         #endregion
 
-        Assert.IsTrue(axisAngle.IsNormal());
-        var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
+        Debug.Assert(axisAngle.IsUnit());
+        var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
         var _ca = 1 - Cos(angle);
@@ -65,16 +63,16 @@ public static class AxisAngleFormulas
         var sinPitch = x * sa - z * y * _ca;
         float yaw, pitch, roll;
 
-        if (sinPitch > SIN_NEAR_90)
+        if (sinPitch > F_SIN_NEAR_90)
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
-            pitch = HALF_PI;
+            pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < MINUS_SIN_NEAR_90)
+        else if (sinPitch < -F_SIN_NEAR_90)
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
-            pitch = MINUS_HALF_PI;
+            pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
@@ -88,12 +86,12 @@ public static class AxisAngleFormulas
     }
 
 
-    public static Matrix4x4 ToMatrix4x4(this AxisAngle axisAngle)
+    public static Matrix4x4 UnitToMatrix(this AxisAngle axisAngle)
     {
         // Reference: Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
-        Assert.IsTrue(axisAngle.IsNormal());
-        var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
+        Debug.Assert(axisAngle.IsUnit());
+        var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
         var ca = Cos(angle);
@@ -128,12 +126,12 @@ public static class AxisAngleFormulas
         return matrix;
     }
 
-    public static Quaternion ToQuaternion(this AxisAngle axisAngle)
+    public static Quaternion UnitToQuaternion(this AxisAngle axisAngle)
     {
         // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
-        Assert.IsTrue(axisAngle.IsNormal());
-        var (x, y, z, angle) = (axisAngle.Axis.X, axisAngle.Axis.Y, axisAngle.Axis.Z, axisAngle.Angle);
+        Debug.Assert(axisAngle.IsUnit());
+        var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var halfAngle = angle * 0.5f;
         var sa = Sin(halfAngle);

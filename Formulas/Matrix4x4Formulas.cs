@@ -1,14 +1,13 @@
 ﻿namespace Rotation3D;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rotation3D.Tests;
+using System.Diagnostics;
 using System.Numerics;
+using static Constants;
 using static MathF;
-using static MathFConstants;
 
 public static class Matrix4x4Formulas
 {
-    public static EulerAngles ToEulerAngles(this Matrix4x4 matrix)
+    public static EulerAngles UnitToEulerAngles(this Matrix4x4 matrix)
     {
         #region Explanations
 
@@ -51,23 +50,23 @@ public static class Matrix4x4Formulas
 
         #endregion
 
-        Assert.IsTrue(matrix.IsNormal());
+        Debug.Assert(matrix.IsUnit());
 
         var (m11, m12, m13, m22, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M22, matrix.M31, matrix.M32, matrix.M33);
 
         float yaw, pitch, roll;
 
-        if (m32 < MINUS_SIN_NEAR_90)
+        if (m32 < -F_SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
-            pitch = HALF_PI;
+            pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (m32 > SIN_NEAR_90)
+        else if (m32 > F_SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
-            pitch = MINUS_HALF_PI;
+            pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
@@ -80,26 +79,26 @@ public static class Matrix4x4Formulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static EulerAngles ToEulerAngles_ScaledMatrix(this Matrix4x4 matrix)
+    public static EulerAngles ScaledToEulerAngles_Ugly(this Matrix4x4 matrix)
     {
         // Similar to the previous one, but supports a scaled matrix.
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);
 
-        var sinPitch = -m32 / Sqrt(m31 * m31 + m32 * m32 + m33 * m33); // backward length
+        var sinPitch = -m32 / Sqrt(m31 * m31 + m32 * m32 + m33 * m33); // forward length
         float yaw, pitch, roll;
 
-        if (sinPitch > SIN_NEAR_90)
+        if (sinPitch > F_SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
-            pitch = HALF_PI;
+            pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < MINUS_SIN_NEAR_90)
+        else if (sinPitch < -F_SIN_NEAR_90)
         {
             yaw = Atan2(-m13, m11);
-            pitch = MINUS_HALF_PI;
+            pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
@@ -116,51 +115,51 @@ public static class Matrix4x4Formulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static Quaternion ToQuaternion(this Matrix4x4 matrix)
+    public static Quaternion UnitToQuaternion(this Matrix4x4 matrix)
     {
         // Reference: Quaternion.CreateFromRotationMatrix(matrix);
 
-        Assert.IsTrue(matrix.IsNormal());
+        Debug.Assert(matrix.IsUnit());
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);
 
         var trace = m11 + m22 + m33;
-        float qX, qY, qZ, qW;
+        float x, y, z, w;
 
         if (trace > 0f)
         {
-            qW = Sqrt(1f + trace) * 0.5f;
-            var invS = 0.25f / qW;
-            qX = (m23 - m32) * invS;
-            qY = (m31 - m13) * invS;
-            qZ = (m12 - m21) * invS;
+            w = Sqrt(1f + trace) * 0.5f;
+            var invS = 0.25f / w;
+            x = (m23 - m32) * invS;
+            y = (m31 - m13) * invS;
+            z = (m12 - m21) * invS;
         }
         else if (m11 >= m22 && m11 >= m33)
         {
-            qX = Sqrt(1f + m11 - m22 - m33) * 0.5f;
-            var invS = 0.25f / qX;
-            qY = (m12 + m21) * invS;
-            qZ = (m13 + m31) * invS;
-            qW = (m23 - m32) * invS;
+            x = Sqrt(1f + m11 - m22 - m33) * 0.5f;
+            var invS = 0.25f / x;
+            y = (m12 + m21) * invS;
+            z = (m13 + m31) * invS;
+            w = (m23 - m32) * invS;
         }
         else if (m22 > m33)
         {
-            qY = Sqrt(1f + m22 - m11 - m33) * 0.5f;
-            var invS = 0.25f / qY;
-            qX = (m21 + m12) * invS;
-            qZ = (m32 + m23) * invS;
-            qW = (m31 - m13) * invS;
+            y = Sqrt(1f + m22 - m11 - m33) * 0.5f;
+            var invS = 0.25f / y;
+            x = (m21 + m12) * invS;
+            z = (m32 + m23) * invS;
+            w = (m31 - m13) * invS;
         }
         else
         {
-            qZ = Sqrt(1f + m33 - m11 - m22) * 0.5f;
-            var invS = 0.25f / qZ;
-            qX = (m31 + m13) * invS;
-            qY = (m32 + m23) * invS;
-            qW = (m12 - m21) * invS;
+            z = Sqrt(1f + m33 - m11 - m22) * 0.5f;
+            var invS = 0.25f / z;
+            x = (m31 + m13) * invS;
+            y = (m32 + m23) * invS;
+            w = (m12 - m21) * invS;
         }
 
-        return new Quaternion(qX, qY, qZ, qW);
+        return new Quaternion(x, y, z, w);
     }
 }

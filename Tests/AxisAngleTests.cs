@@ -1,97 +1,66 @@
 ﻿namespace Rotation3D.Tests;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rotation3D.Double;
 using System.Numerics;
 
 [TestClass]
 public sealed class AxisAngleTests : TestsBase
 {
     [TestMethod]
-    public void ToEulerAngles()
+    public void UnitToEulerAngles()
     {
-        // Truth: AxisAngle             =>             Quaternion (system)
-        // Test:  AxisAngle => EulerAngles (custom) => Quaternion (system)
+        var result = Prepare(
+            create: Randomizer.CreateUnitAxisAngle,
+            toDouble: a => a,
+            fromDouble: e => e,
+            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            srcToString: a => a.Stringify(),
+            resToString: e => e.Stringify(),
+            calcDouble: a => EulerAngles.Identity, // No reason to convert
+            calcSystem: a => EulerAngles.Identity, // System has no solution
+            calcCustom: a => a.UnitToEulerAngles());
 
-        const float maxDiffAllowed = 0.0008648336f;
-
-        var maxDiff = 0f;
-        var maxDiffAxisAngle = default(AxisAngle);
-        var maxDiffEulerAngles = default(EulerAngles);
-        var maxDiffQuaternionDirect = default(Quaternion);
-        var maxDiffQuaternionResult = default(Quaternion);
-
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var axisAngle = GetRandomNormalAxisAngle();
-            var eulerAngles = axisAngle.ToEulerAngles();
-            Assert.IsTrue(eulerAngles.IsNormal());
-            var quaternionDirect = Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-            var quaternionResult = Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
-            var diff = CalcSumDiff(quaternionDirect, quaternionResult);
-
-            if (maxDiff < diff)
-            {
-                maxDiff = diff;
-                maxDiffAxisAngle = axisAngle;
-                maxDiffEulerAngles = eulerAngles;
-                maxDiffQuaternionDirect = quaternionDirect;
-                maxDiffQuaternionResult = quaternionResult;
-            }
-        }
-
-        Console.WriteLine($"Max diff: {maxDiff}");
-
-        if (maxDiff > 0)
-        {
-            Console.WriteLine($"AxisAngle: {maxDiffAxisAngle}");
-            Console.WriteLine($"EulerAngles: {maxDiffEulerAngles}");
-            Console.WriteLine($"Quaternion direct: {maxDiffQuaternionDirect}");
-            Console.WriteLine($"Quaternion result: {maxDiffQuaternionResult}");
-
-            if (maxDiff > maxDiffAllowed)
-                Assert.Fail();
-        }
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00085264444f);
     }
 
     [TestMethod]
-    public void ToMatrix4x4()
+    public void UnitToMatrix()
     {
-        // Truth: AxisAngle => Matrix4x4 (system)
-        // Test:  AxisAngle => Matrix4x4 (custom)
+        var result = Prepare(
+            create: Randomizer.CreateUnitAxisAngle,
+            toDouble: a => a.ToDouble(),
+            fromDouble: m => m.ToSystem(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            srcToString: a => a.Stringify(),
+            resToString: m => m.Stringify(),
+            calcDouble: a => a.UnitToMatrix(),
+            calcSystem: a => Matrix4x4.CreateFromAxisAngle(a.Axis, a.Angle),
+            calcCustom: a => a.UnitToMatrix());
 
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var axisAngle = GetRandomNormalAxisAngle();
-            var matrixSystem = Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-            var matrixCustom = axisAngle.ToMatrix4x4();
-            Assert.IsTrue(matrixCustom.IsNormal());
-            Assert.AreEqual(matrixSystem, matrixCustom);
-        }
-
-        Console.WriteLine("Max diff: 0");
+        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 7.1525574e-7f);
     }
 
     [TestMethod]
-    public void ToQuaternion()
+    public void UnitToQuaternion()
     {
-        // Truth: AxisAngle => Quaternion (system)
-        // Test:  AxisAngle => Quaternion (custom)
+        var result = Prepare(
+            create: Randomizer.CreateUnitAxisAngle,
+            toDouble: a => a.ToDouble(),
+            fromDouble: m => m.ToSystem(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            srcToString: a => a.Stringify(),
+            resToString: m => m.Stringify(),
+            calcDouble: a => a.UnitToQuaternion(),
+            calcSystem: a => Quaternion.CreateFromAxisAngle(a.Axis, a.Angle),
+            calcCustom: a => a.UnitToQuaternion());
 
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var axisAngle = GetRandomNormalAxisAngle();
-            var quaternionSystem = Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-            var quaternionCustom = axisAngle.ToQuaternion();
-            Assert.IsTrue(quaternionCustom.IsNormal());
-            Assert.AreEqual(quaternionSystem, quaternionCustom);
-        }
-
-        Console.WriteLine("Max diff: 0");
+        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 2.0861626e-7f);
     }
 }

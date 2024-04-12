@@ -1,223 +1,104 @@
 ﻿namespace Rotation3D.Tests;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rotation3D.Double;
 using System.Numerics;
 
 [TestClass]
 public sealed class QuaternionTests : TestsBase
 {
-    //[TestMethod]
-    public void ToAxisAngle_NotPassed()
+    [TestMethod]
+    public void UnitToAxisAngle_Draft()
     {
-        // Truth: Quaternion
-        // Test:  Quaternion => AxisAngle (custom) => Quaternion (system)
+        var result = Prepare(
+            create: Randomizer.CreateUnitQuaternion,
+            toDouble: q => q,
+            fromDouble: a => a,
+            compare: (qSrc, aExp, aAct) => qSrc.Diff(aAct.ToDouble().UnitToQuaternion().ToSystem()),
+            srcToString: q => q.Stringify(),
+            resToString: a => a.Stringify(),
+            calcDouble: q => AxisAngle.Identity, // No reason to convert
+            calcSystem: q => AxisAngle.Identity, // System has no solution
+            calcCustom: q => q.UnitToAxisAngle_Draft());
 
-        const float maxDiffAllowed = 1.417473E-06f;
-
-        var maxDiff = 0f;
-        var maxDiffAxisAngle = default(AxisAngle);
-        var maxDiffQuaternionSource = default(Quaternion);
-        var maxDiffQuaternionRevert = default(Quaternion);
-
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var quaternionSource = GetRandomNormalQuaternion();
-            var axisAngle = quaternionSource.ToAxisAngle();
-            Assert.IsTrue(axisAngle.IsNormal());
-            var quaternionRevert = Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-            var diff = CalcSumDiff(quaternionSource, quaternionRevert);
-
-            if (maxDiff < diff)
-            {
-                maxDiff = diff;
-                maxDiffAxisAngle = axisAngle;
-                maxDiffQuaternionSource = quaternionSource;
-                maxDiffQuaternionRevert = quaternionRevert;
-            }
-        }
-
-        Console.WriteLine($"Max diff: {maxDiff}");
-
-        if (maxDiff > 0)
-        {
-            Console.WriteLine($"AxisAngle: {maxDiffAxisAngle}");
-            Console.WriteLine($"Quaternion source: {maxDiffQuaternionSource}");
-            Console.WriteLine($"Quaternion revert: {maxDiffQuaternionRevert}");
-
-            if (maxDiff > maxDiffAllowed)
-                Assert.Fail();
-        }
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00079226494f);
     }
 
     [TestMethod]
-    public void ToEulerAngles()
+    public void UnitToEulerAngles()
     {
-        // Truth: Quaternion
-        // Test:  Quaternion => EulerAngles (custom) => Quaternion (system)
+        var result = Prepare(
+            create: Randomizer.CreateUnitQuaternion,
+            toDouble: q => q,
+            fromDouble: e => e,
+            compare: (qSrc, eExp, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            srcToString: q => q.Stringify(),
+            resToString: e => e.Stringify(),
+            calcDouble: q => EulerAngles.Identity, // No reason to convert
+            calcSystem: q => EulerAngles.Identity, // System has no solution
+            calcCustom: q => q.UnitToEulerAngles());
 
-        const float maxDiffAllowed = 0.0008686781f;
-
-        var maxDiff = 0f;
-        var maxDiffEulerAngles = default(EulerAngles);
-        var maxDiffQuaternionSource = default(Quaternion);
-        var maxDiffQuaternionRevert = default(Quaternion);
-
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var quaternionSource = GetRandomNormalQuaternion();
-            var eulerAngles = quaternionSource.ToEulerAngles();
-            Assert.IsTrue(eulerAngles.IsNormal());
-            var quaternionRevert = Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
-            var diff = CalcSumDiff(quaternionSource, quaternionRevert);
-
-            if (maxDiff < diff)
-            {
-                maxDiff = diff;
-                maxDiffEulerAngles = eulerAngles;
-                maxDiffQuaternionSource = quaternionSource;
-                maxDiffQuaternionRevert = quaternionRevert;
-            }
-        }
-
-        Console.WriteLine($"Max diff: {maxDiff}");
-
-        if (maxDiff > 0)
-        {
-            Console.WriteLine($"EulerAngles: {maxDiffEulerAngles}");
-            Console.WriteLine($"Quaternion source: {maxDiffQuaternionSource}");
-            Console.WriteLine($"Quaternion revert: {maxDiffQuaternionRevert}");
-
-            if (maxDiff > maxDiffAllowed)
-                Assert.Fail();
-        }
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.0008571595f);
     }
 
     [TestMethod]
-    public void ToEulerAngles_NonUnit()
+    public void ScaledToEulerAngles()
     {
-        // Truth: Quaternion_NonUnit => Quaternion (system)
-        // Test:  Quaternion_NonUnit => EulerAngles (custom) => Quaternion (system)
+        var result = Prepare(
+            create: Randomizer.CreateScaledQuaternion,
+            toDouble: q => q,
+            fromDouble: e => e,
+            compare: (qSrc, eExp, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            srcToString: q => q.Stringify(),
+            resToString: e => e.Stringify(),
+            calcDouble: q => EulerAngles.Identity, // No reason to convert
+            calcSystem: q => EulerAngles.Identity, // System has no solution
+            calcCustom: q => q.ScaledToEulerAngles());
 
-        const float maxDiffAllowed = 0.0009267777f;
-
-        var maxDiff = 0f;
-        var maxDiffEulerAngles = default(EulerAngles);
-        var maxDiffEulerAnglesFromNormal = default(EulerAngles);
-        var maxDiffQuaternionSource = default(Quaternion);
-        var maxDiffQuaternionNormal = default(Quaternion);
-        var maxDiffQuaternionRevert = default(Quaternion);
-
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var quaternionSource = GetRandomNonUnitQuaternion();
-            var quaternionNormal = Quaternion.Normalize(quaternionSource);
-            var eulerAngles = quaternionSource.ToEulerAngles_NonUnitQuaternion();
-            var eulerAnglesFromNormal = quaternionNormal.ToEulerAngles();
-            Assert.IsTrue(quaternionNormal.IsNormal());
-            Assert.IsTrue(eulerAngles.IsNormal());
-            Assert.IsTrue(eulerAnglesFromNormal.IsNormal());
-            var quaternionRevert = Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
-            var diff = CalcSumDiff(quaternionNormal, quaternionRevert);
-
-            if (maxDiff < diff)
-            {
-                maxDiff = diff;
-                maxDiffEulerAngles = eulerAngles;
-                maxDiffEulerAnglesFromNormal = eulerAnglesFromNormal;
-                maxDiffQuaternionSource = quaternionSource;
-                maxDiffQuaternionNormal = quaternionNormal;
-                maxDiffQuaternionRevert = quaternionRevert;
-            }
-        }
-
-        Console.WriteLine($"Max diff: {maxDiff}");
-
-        if (maxDiff > 0)
-        {
-            Console.WriteLine($"EulerAngles:             {maxDiffEulerAngles}");
-            Console.WriteLine($"EulerAngles from normal: {maxDiffEulerAnglesFromNormal}");
-            Console.WriteLine($"Quaternion source: {maxDiffQuaternionSource}");
-            Console.WriteLine($"Quaternion normal: {maxDiffQuaternionNormal}");
-            Console.WriteLine($"Quaternion revert: {maxDiffQuaternionRevert}");
-
-            if (maxDiff > maxDiffAllowed)
-                Assert.Fail();
-        }
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00086191297f);
     }
 
     [TestMethod]
-    public void ToMatrix4x4()
+    public void UnitToMatrix()
     {
-        // Truth: Quaternion => Matrix4x4 (system)
-        // Test:  Quaternion => Matrix4x4 (custom)
+        var result = Prepare(
+            create: Randomizer.CreateUnitQuaternion,
+            toDouble: q => q.ToDouble(),
+            fromDouble: m => m.ToSystem(),
+            compare: (_, q1, q2) => q1.Diff(q2),
+            srcToString: q => q.Stringify(),
+            resToString: m => m.Stringify(),
+            calcDouble: q => q.UnitToMatrix(),
+            calcSystem: Matrix4x4.CreateFromQuaternion,
+            calcCustom: q => q.UnitToMatrix());
 
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var quaternion = GetRandomNormalQuaternion();
-            var matrixSystem = Matrix4x4.CreateFromQuaternion(quaternion);
-            var matrixCustom = quaternion.ToMatrix4x4();
-            Assert.IsTrue(matrixCustom.IsNormal());
-            Assert.AreEqual(matrixSystem, matrixCustom);
-        }
-
-        Console.WriteLine("Max diff: 0");
+        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 5.8859587e-7f);
     }
 
     [TestMethod]
-    public void ToMatrix4x4_NonUnit()
+    public void ScaledToMatrix()
     {
-        // Truth: Quaternion_NonUnit => Quaternion => Matrix4x4 (system)
-        // Test:  Quaternion_NonUnit => Matrix4x4 (custom)
+        var result = Prepare(
+            create: Randomizer.CreateScaledQuaternion,
+            toDouble: q => q.ToDouble(),
+            fromDouble: m => m.ToSystem(),
+            compare: (_, q1, q2) => q1.Diff(q2),
+            srcToString: q => q.Stringify(),
+            resToString: m => m.Stringify(),
+            calcDouble: q => q.ScaledToMatrix(),
+            calcSystem: q => Matrix4x4.CreateFromQuaternion(Quaternion.Normalize(q)),
+            calcCustom: q => q.ScaledToMatrix());
 
-        const float maxDiffAllowed = 2.65240669E-06f;
-
-        var maxDiff = 0f;
-        var maxDiffQuaternionSource = default(Quaternion);
-        var maxDiffQuaternionNormal = default(Quaternion);
-        var maxDiffMatrixSystem = default(Matrix4x4);
-        var maxDiffMatrixCustom = default(Matrix4x4);
-
-        var iteration = 0;
-
-        while (++iteration <= _iterationCount)
-        {
-            var quaternionSource = GetRandomNonUnitQuaternion();
-            var quaternionNormal = Quaternion.Normalize(quaternionSource);
-            var matrixSystem = Matrix4x4.CreateFromQuaternion(quaternionNormal);
-            var matrixCustom = quaternionSource.ToMatrix4x4_NonUnitQuaternion();
-            Assert.IsTrue(matrixCustom.IsNormal());
-
-            var diff = CalcSumDiff(matrixSystem, matrixCustom);
-
-            if (maxDiff < diff)
-            {
-                maxDiff = diff;
-                maxDiffQuaternionSource = quaternionSource;
-                maxDiffQuaternionNormal = quaternionNormal;
-                maxDiffMatrixSystem = matrixSystem;
-                maxDiffMatrixCustom = matrixCustom;
-            }
-        }
-
-        Console.WriteLine($"Max diff: {maxDiff}");
-
-        if (maxDiff > 0)
-        {
-            Console.WriteLine($"Quaternion source: {maxDiffQuaternionSource}");
-            Console.WriteLine($"Quaternion normal: {maxDiffQuaternionNormal}");
-            Console.WriteLine($"Matrix4x4 system: {maxDiffMatrixSystem}");
-            Console.WriteLine($"Matrix4x4 custom: {maxDiffMatrixCustom}");
-
-            if (maxDiff > maxDiffAllowed)
-                Assert.Fail();
-        }
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 1.1771917e-6f);
     }
 }

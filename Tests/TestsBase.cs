@@ -1,179 +1,160 @@
 ﻿namespace Rotation3D.Tests;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Numerics;
+using Rotation3D.Double;
+using System.Diagnostics;
 
 public abstract class TestsBase
 {
-    protected const int _iterationCount = 10_000_000;
+    protected const int IterationCount = Constants.TestIterationCount;
 
-    private const double DOUBLE_TWO_PI = Math.PI * 2.0;
-    private const double DOUBLE_HALF_PI = Math.PI / 2.0;
-    private static readonly Random _random = new();
+    private static bool _isFirstInitialize = true;
 
-    protected static AxisAngle GetRandomNormalAxisAngle()
+    [TestInitialize]
+    public void Initialize()
     {
-        var rawX = _random.NextDouble() * 2.0 - 1.0;
-        var rawY = _random.NextDouble() * 2.0 - 1.0;
-        var rawZ = _random.NextDouble() * 2.0 - 1.0;
-
-        var invNorm = 1.0 / Math.Sqrt(rawX * rawX + rawY * rawY + rawZ * rawZ);
-        var normX = (float)(rawX * invNorm);
-        var normY = (float)(rawY * invNorm);
-        var normZ = (float)(rawZ * invNorm);
-
-        var angle = (float)(_random.NextDouble() * DOUBLE_TWO_PI - Math.PI);
-        var axisAngle = new AxisAngle(normX, normY, normZ, angle);
-        Assert.IsTrue(axisAngle.IsNormal());
-        return axisAngle;
+        if (_isFirstInitialize)
+        {
+            _isFirstInitialize = false;
+            DoubleConstants.SelfCheck();
+            Constants.SelfCheck();
+        }
     }
 
-    protected static EulerAngles GetRandomNormalEulerAngles()
+    protected static Result<TSrc, TRes> Prepare<TSrc, TSrcDouble, TRes, TResDouble>(
+        Func<TSrc> create,
+        Func<TSrc, TSrcDouble> toDouble,
+        Func<TResDouble, TRes> fromDouble,
+        Func<TSrc, TRes, TRes, float> compare,
+        Func<TSrc, string> srcToString,
+        Func<TRes, string> resToString,
+        Func<TSrcDouble, TResDouble> calcDouble,
+        Func<TSrc, TRes> calcSystem,
+        Func<TSrc, TRes> calcCustom)
     {
-        var yaw = (float)(_random.NextDouble() * DOUBLE_TWO_PI - Math.PI);
-        var pitch = (float)(_random.NextDouble() * Math.PI - DOUBLE_HALF_PI);
-        var roll = (float)(_random.NextDouble() * DOUBLE_TWO_PI - Math.PI);
+        var sw = Stopwatch.StartNew();
 
-        var eulerAngles = new EulerAngles(yaw, pitch, roll);
-        Assert.IsTrue(eulerAngles.IsNormal());
-        return eulerAngles;
+        long initializeTime;
+        long calcDoubleTime;
+        long calcSystemTime;
+        long calcCustomTime;
+        long finalizeTime;
+        var srcSystem = new TSrc[IterationCount];
+        var srcDouble = new TSrcDouble[IterationCount];
+        var resDouble = new TResDouble[IterationCount];
+        var resSystem = new TRes[IterationCount];
+        var resCustom = new TRes[IterationCount];
+        TSrc srcItem;
+
+        for (int i = 0; i < IterationCount; i++)
+        {
+            srcItem = create();
+            srcSystem[i] = srcItem;
+            srcDouble[i] = toDouble(srcItem);
+        }
+
+        initializeTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            resDouble[i] = calcDouble(srcDouble[i]);
+        calcDoubleTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            resSystem[i] = calcSystem(srcSystem[i]);
+        calcSystemTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            resCustom[i] = calcCustom(srcSystem[i]);
+        calcCustomTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+
+        var sumDiffSystem = 0f;
+        var sumDiffCustom = 0f;
+
+        var maxDiffSystem = 0f;
+        var maxDiffCustom = 0f;
+
+        TSrc maxDiffCustomSrc = srcSystem[0];
+        TRes maxDiffCustomResDouble = fromDouble(resDouble[0]);
+        TRes maxDiffCustomResSystem = resSystem[0];
+        TRes maxDiffCustomRes = resCustom[0];
+        var maxDiffCustomSystem = 0f;
+
+        for (int i = 0; i < IterationCount; i++)
+        {
+            srcItem = srcSystem[i];
+            var itemDouble = fromDouble(resDouble[i]);
+            var diffSystem = compare(srcItem, itemDouble, resSystem[i]);
+            var diffCustom = compare(srcItem, itemDouble, resCustom[i]);
+
+            sumDiffSystem += diffSystem;
+            sumDiffCustom += diffCustom;
+
+            if (maxDiffSystem < diffSystem)
+                maxDiffSystem = diffSystem;
+
+            if (maxDiffCustom < diffCustom)
+            {
+                maxDiffCustom = diffCustom;
+                maxDiffCustomSrc = srcSystem[i];
+                maxDiffCustomResDouble = itemDouble;
+                maxDiffCustomResSystem = resSystem[i];
+                maxDiffCustomRes = resCustom[i];
+                maxDiffCustomSystem = diffSystem;
+            }
+        }
+
+        var avgDiffSystem = sumDiffSystem / IterationCount;
+        var avgDiffCustom = sumDiffCustom / IterationCount;
+
+        finalizeTime = sw.ElapsedMilliseconds;
+
+        var calculationTime = calcDoubleTime + calcSystemTime + calcCustomTime;
+        Console.WriteLine($"Calc double: {calcDoubleTime,4} ms    Iterations:   {IterationCount:N}");
+        Console.WriteLine($"Calc system: {calcSystemTime,4} ms    Initialize:   {initializeTime,4} ms");
+        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Calculation:  {calculationTime,4} ms");
+        Console.WriteLine($"                        Finalize:     {finalizeTime,4} ms");
+        Console.WriteLine();
+
+        Console.WriteLine($"System diff:  max: {maxDiffSystem.Stringify(","),-13}  avg: {avgDiffSystem.Stringify()}");
+        Console.WriteLine($"Custom diff:  max: {maxDiffCustom.Stringify(","),-13}  avg: {avgDiffCustom.Stringify()}");
+        Console.WriteLine();
+
+        Console.WriteLine("== Worst for custom ==");
+        Console.WriteLine($"Source:  {"",12}   {srcToString(maxDiffCustomSrc)}");
+        Console.WriteLine($"Double:  {0,-12}   {resToString(maxDiffCustomResDouble)}");
+        Console.WriteLine($"System:  {maxDiffCustomSystem.Stringify()}   {resToString(maxDiffCustomResSystem)}");
+        Console.WriteLine($"Custom:  {maxDiffCustom.Stringify()}   {resToString(maxDiffCustomRes)}");
+
+        return new Result<TSrc, TRes>(
+            avgDiffSystem: avgDiffSystem,
+            avgDiffCustom: avgDiffCustom,
+            maxDiffSystem: maxDiffSystem,
+            maxDiffCustom: maxDiffCustom
+        );
     }
 
-    protected static Matrix4x4 GetRandomNormalMatrix4x4()
+    protected sealed class Result<TSrc, TRes>
     {
-        var matrix = GetRandomMatrix4x4(scaleX: 1.0, scaleY: 1.0, scaleZ: 1.0);
-        Assert.IsTrue(matrix.IsNormal());
-        return matrix;
-    }
+        public float AvgDiffSystem { get; }
+        public float AvgDiffCustom { get; }
+        public float MaxDiffSystem { get; }
+        public float MaxDiffCustom { get; }
 
-    protected static Matrix4x4 GetRandomScaledMatrix4x4()
-    {
-        var scaleX = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
-        var scaleY = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
-        var scaleZ = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
-        var matrix = GetRandomMatrix4x4(scaleX: scaleX, scaleY: scaleY, scaleZ: scaleZ);
-        return matrix;
-    }
-
-    private static Matrix4x4 GetRandomMatrix4x4(double scaleX, double scaleY, double scaleZ)
-    {
-        // Creating a normal quaternion and converting it to a matrix.
-        // The Convertion implementaion is similar to: Matrix4x4.CreateFromQuaternion(Quaternion quaternion)
-        // but on doubles to prevent float quantization violations.
-
-        double rawX = _random.NextDouble() * 2.0 - 1.0;
-        double rawY = _random.NextDouble() * 2.0 - 1.0;
-        double rawZ = _random.NextDouble() * 2.0 - 1.0;
-        double rawW = _random.NextDouble() * 2.0 - 1.0;
-
-        double invNorm = 1.0 / Math.Sqrt(rawX * rawX + rawY * rawY + rawZ * rawZ + rawW * rawW);
-        double quaternionX = rawX * invNorm;
-        double quaternionY = rawY * invNorm;
-        double quaternionZ = rawZ * invNorm;
-        double quaternionW = rawW * invNorm;
-
-        Matrix4x4 matrix = Matrix4x4.Identity;
-
-        double xx = quaternionX * quaternionX;
-        double yy = quaternionY * quaternionY;
-        double zz = quaternionZ * quaternionZ;
-
-        double xy = quaternionX * quaternionY;
-        double wz = quaternionZ * quaternionW;
-        double xz = quaternionZ * quaternionX;
-        double wy = quaternionY * quaternionW;
-        double yz = quaternionY * quaternionZ;
-        double wx = quaternionX * quaternionW;
-
-        matrix.M11 = (float)(scaleX * (1.0 - 2.0 * (yy + zz)));
-        matrix.M12 = (float)(scaleX * (2.0 * (xy + wz)));
-        matrix.M13 = (float)(scaleX * (2.0 * (xz - wy)));
-
-        matrix.M21 = (float)(scaleY * (2.0 * (xy - wz)));
-        matrix.M22 = (float)(scaleY * (1.0 - 2.0 * (zz + xx)));
-        matrix.M23 = (float)(scaleY * (2.0 * (yz + wx)));
-
-        matrix.M31 = (float)(scaleZ * (2.0 * (xz + wy)));
-        matrix.M32 = (float)(scaleZ * (2.0 * (yz - wx)));
-        matrix.M33 = (float)(scaleZ * (1.0 - 2.0 * (yy + xx)));
-
-        return matrix;
-    }
-
-    protected static Quaternion GetRandomNormalQuaternion()
-    {
-        var rawX = _random.NextDouble() * 2.0 - 1.0;
-        var rawY = _random.NextDouble() * 2.0 - 1.0;
-        var rawZ = _random.NextDouble() * 2.0 - 1.0;
-        var rawW = _random.NextDouble() * 2.0 - 1.0;
-
-        var invNorm = 1 / Math.Sqrt(rawX * rawX + rawY * rawY + rawZ * rawZ + rawW * rawW);
-        var normX = (float)(rawX * invNorm);
-        var normY = (float)(rawY * invNorm);
-        var normZ = (float)(rawZ * invNorm);
-        var normW = (float)(rawW * invNorm);
-
-        var quaternion = new Quaternion(normX, normY, normZ, normW);
-        Assert.IsTrue(quaternion.IsNormal());
-        return quaternion;
-    }
-
-    protected static Quaternion GetRandomNonUnitQuaternion()
-    {
-        var rawX = _random.NextDouble() * 2.0 - 1.0;
-        var rawY = _random.NextDouble() * 2.0 - 1.0;
-        var rawZ = _random.NextDouble() * 2.0 - 1.0;
-        var rawW = _random.NextDouble() * 2.0 - 1.0;
-
-        var invNorm = 1 / Math.Sqrt(rawX * rawX + rawY * rawY + rawZ * rawZ + rawW * rawW);
-        var scale = Math.Pow(10, _random.NextDouble() * 6.0 - 3.0);
-
-        var x = (float)(rawX * invNorm * scale);
-        var y = (float)(rawY * invNorm * scale);
-        var z = (float)(rawZ * invNorm * scale);
-        var w = (float)(rawW * invNorm * scale);
-
-        var quaternion = new Quaternion(x, y, z, w);
-        return quaternion;
-    }
-
-    protected static float CalcSumDiff(Matrix4x4 m1, Matrix4x4 m2)
-    {
-        if (m1.Equals(m2))
-            return 0f;
-
-        var m11Diff = MathF.Abs(m1.M11 - m2.M11);
-        var m12Diff = MathF.Abs(m1.M12 - m2.M12);
-        var m13Diff = MathF.Abs(m1.M13 - m2.M13);
-        var m21Diff = MathF.Abs(m1.M21 - m2.M21);
-        var m22Diff = MathF.Abs(m1.M22 - m2.M22);
-        var m23Diff = MathF.Abs(m1.M23 - m2.M23);
-        var m31Diff = MathF.Abs(m1.M31 - m2.M31);
-        var m32Diff = MathF.Abs(m1.M32 - m2.M32);
-        var m33DIff = MathF.Abs(m1.M33 - m2.M33);
-
-        var sumDiff = m11Diff + m12Diff + m13Diff + m21Diff + m22Diff + m23Diff + m31Diff + m32Diff + m33DIff;
-        return sumDiff;
-    }
-
-    protected static float CalcSumDiff(Quaternion q1, Quaternion q2)
-    {
-        if (q1.Equals(q2))
-            return 0f;
-
-        var xDiff1 = MathF.Abs(q1.X - q2.X);
-        var yDiff1 = MathF.Abs(q1.Y - q2.Y);
-        var zDiff1 = MathF.Abs(q1.Z - q2.Z);
-        var wDiff1 = MathF.Abs(q1.W - q2.W);
-
-        var xDiff2 = MathF.Abs(q1.X + q2.X);
-        var yDiff2 = MathF.Abs(q1.Y + q2.Y);
-        var zDiff2 = MathF.Abs(q1.Z + q2.Z);
-        var wDiff2 = MathF.Abs(q1.W + q2.W);
-
-        var sumDiff1 = xDiff1 + yDiff1 + zDiff1 + wDiff1;
-        var sumDiff2 = xDiff2 + yDiff2 + zDiff2 + wDiff2;
-        return MathF.Min(sumDiff1, sumDiff2);
+        public Result(
+            float avgDiffSystem,
+            float avgDiffCustom,
+            float maxDiffSystem,
+            float maxDiffCustom)
+        {
+            AvgDiffSystem = avgDiffSystem;
+            AvgDiffCustom = avgDiffCustom;
+            MaxDiffSystem = maxDiffSystem;
+            MaxDiffCustom = maxDiffCustom;
+        }
     }
 }

@@ -1,13 +1,12 @@
 ﻿namespace Rotation3D;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rotation3D.Tests;
+using System.Diagnostics;
 using System.Numerics;
 using static MathF;
 
 public static class EulerAnglesFormulas
 {
-    public static Matrix4x4 ToMatrix4x4(this EulerAngles eulerAngles)
+    public static Matrix4x4 UnitToMatrix(this EulerAngles eulerAngles)
     {
         #region Explanations
 
@@ -50,7 +49,7 @@ public static class EulerAnglesFormulas
 
         #endregion
 
-        Assert.IsTrue(eulerAngles.IsNormal());
+        Debug.Assert(eulerAngles.IsUnit());
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
         var sy = Sin(yaw);
@@ -80,11 +79,11 @@ public static class EulerAnglesFormulas
         return matrix;
     }
 
-    public static Quaternion ToQuaternion(this EulerAngles eulerAngles)
+    public static Quaternion UnitToQuaternion(this EulerAngles eulerAngles)
     {
         // Reference: Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
-        Assert.IsTrue(eulerAngles.IsNormal());
+        Debug.Assert(eulerAngles.IsUnit());
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
         var halfYaw = yaw * 0.5f;
@@ -103,11 +102,11 @@ public static class EulerAnglesFormulas
         var cysp = cy * sp;
         var cycp = cy * cp;
 
-        var qX = cysp * cr + sycp * sr;
-        var qY = sycp * cr - cysp * sr;
-        var qZ = cycp * sr - sysp * cr;
-        var qW = cycp * cr + sysp * sr;
+        var x = cysp * cr + sycp * sr;
+        var y = sycp * cr - cysp * sr;
+        var z = cycp * sr - sysp * cr;
+        var w = cycp * cr + sysp * sr;
 
-        return new Quaternion(qX, qY, qZ, qW);
+        return new Quaternion(x, y, z, w);
     }
 }

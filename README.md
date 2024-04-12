@@ -5,7 +5,7 @@ Euler angles are right-handed with YXZ axis priority order,
 where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 <br><br>
 
-## Normalized converting
+## Unit converting
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
@@ -16,11 +16,11 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 
 <br>
 
-## Not normalized converting
+## Scaled converting
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
 | **AxisAngle** | &nbsp;– | ❌ Not yet | ❌ Not yet | ❌ Not yet |
 | **EulerAngles** | &nbsp;– | &nbsp;– | &nbsp;– | &nbsp;– |
-| **Matrix4x4** | ❌ Not yet | ⚠️ Not best | &nbsp;– | ❌ Not yet |
+| **Matrix4x4** | ❌ Not yet | ⚠️ Ugly | &nbsp;– | ❌ Not yet |
 | **Quaternion** | ❌ Not yet | ✅ Tested | ✅ Tested | &nbsp;– |
