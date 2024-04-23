@@ -5,7 +5,8 @@ using static Constants;
 
 public readonly struct AxisAngle
 {
-    public static AxisAngle Identity { get; } = new(x: 1f, y: 0f, z: 0f, angle: 0f);
+    public static AxisAngle Zero { get; } = new(axis: Vector3.Zero, angle: 0f);
+    public static AxisAngle Identity { get; } = new(axis: Vector3.UnitX, angle: 0f);
 
     public readonly Vector3 Axis;
     public readonly float Angle;

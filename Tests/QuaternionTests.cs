@@ -93,7 +93,7 @@ public sealed class QuaternionTests : TestsBase
             compare: (_, q1, q2) => q1.Diff(q2),
             srcToString: q => q.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: q => q.ScaledToMatrix(),
+            calcDouble: q => q.Normalize().UnitToMatrix(),
             calcSystem: q => Matrix4x4.CreateFromQuaternion(Quaternion.Normalize(q)),
             calcCustom: q => q.ScaledToMatrix());
 

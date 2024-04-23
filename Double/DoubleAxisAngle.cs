@@ -5,7 +5,7 @@ using static Math;
 
 public readonly struct DoubleAxisAngle
 {
-    public static DoubleAxisAngle Identity { get; } = new(x: 1.0, y: 0.0, z: 0.0, angle: 0.0);
+    public static DoubleAxisAngle Zero { get; } = new(axis: DoubleVector3.Zero, angle: 0.0);
 
     public readonly DoubleVector3 Axis;
     public readonly double Angle;
@@ -14,10 +14,6 @@ public readonly struct DoubleAxisAngle
     public readonly double Y => Axis.Y;
     public readonly double Z => Axis.Z;
     public readonly double AngleDegrees => Angle * RAD_TO_DEG;
-
-    public DoubleAxisAngle(AxisAngle axisAngle)
-        : this(axisAngle.Axis.ToDouble(), axisAngle.Angle)
-    { }
 
     public DoubleAxisAngle(DoubleVector3 axis, double angle)
     {
@@ -39,13 +35,30 @@ public readonly struct DoubleAxisAngle
         return new DoubleAxisAngle(x, y, z, angle * DEG_TO_RAD);
     }
 
-    public DoubleEulerAngles ToEulerAngles()
+    public DoubleAxisAngle NormalizeHard()
     {
+        var sqLenAxis = X * X + Y * Y + Z * Z;
+
+        if (sqLenAxis == 0)
+            return Zero;
+
+        var invLenAxis = 1.0 / Sqrt(sqLenAxis);
+        var x = X * invLenAxis;
+        var y = Y * invLenAxis;
+        var z = Z * invLenAxis;
+        var angle = Angle.NormalizeAngleHard();
+        return new DoubleAxisAngle(x, y, z, angle);
+    }
+
+    public DoubleEulerAngles UnitToEulerAngles()
+    {
+        //todo assert unit
         throw new NotImplementedException();
     }
 
     public DoubleMatrix4x4 UnitToMatrix()
     {
+        //todo assert unit
         var sa = Sin(Angle);
         var ca = Cos(Angle);
         var xx = X * X;
@@ -81,6 +94,7 @@ public readonly struct DoubleAxisAngle
 
     public DoubleQuaternion UnitToQuaternion()
     {
+        //todo assert unit
         var halfAngle = Angle * 0.5;
         var sa = Sin(halfAngle);
 

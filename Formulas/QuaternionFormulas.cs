@@ -13,7 +13,12 @@ public static class QuaternionFormulas
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        var invLen = 1f / Sqrt(x * x + y * y + z * z + w * w);
+        var sqLen = x * x + y * y + z * z + w * w;
+
+        if (sqLen == 0)
+            return Quaternion.Zero;
+
+        var invLen = 1f / Sqrt(sqLen);
         return new Quaternion(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 
@@ -41,7 +46,7 @@ public static class QuaternionFormulas
 
         #endregion
 
-        Debug.Assert(quaternion.IsUnit());
+        Debug.Assert(quaternion.IsUnitAbout());
         var (qX, qY, qZ, qW) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var angle = Acos(qW) * 2f;
@@ -102,7 +107,7 @@ public static class QuaternionFormulas
 
         #endregion
 
-        Debug.Assert(quaternion.IsUnit());
+        Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var halfSinPitch = x * w - y * z;
@@ -206,7 +211,7 @@ public static class QuaternionFormulas
     {
         // Reference: Matrix4x4.CreateFromQuaternion(quaternion);
 
-        Debug.Assert(quaternion.IsUnit());
+        Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var xx = x * x;

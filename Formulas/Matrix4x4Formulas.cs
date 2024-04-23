@@ -50,7 +50,7 @@ public static class Matrix4x4Formulas
 
         #endregion
 
-        Debug.Assert(matrix.IsUnit());
+        Debug.Assert(matrix.IsUnitAbout());
 
         var (m11, m12, m13, m22, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M22, matrix.M31, matrix.M32, matrix.M33);
@@ -119,7 +119,7 @@ public static class Matrix4x4Formulas
     {
         // Reference: Quaternion.CreateFromRotationMatrix(matrix);
 
-        Debug.Assert(matrix.IsUnit());
+        Debug.Assert(matrix.IsUnitAbout());
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);

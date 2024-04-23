@@ -5,7 +5,7 @@ using System.Numerics;
 
 public static class Vector3Extensions
 {
-    public static bool IsUnit(this Vector3 vector)
+    public static bool IsUnitAbout(this Vector3 vector)
     {
         var diff = vector.DiffUnit();
         var isUnit = diff <= Constants.Vector3UnitMaxDiff;

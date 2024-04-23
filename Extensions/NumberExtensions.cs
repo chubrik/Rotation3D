@@ -2,8 +2,15 @@
 
 using static Constants;
 
-public static class FloatExtensions
+public static class NumberExtensions
 {
+    public static float NormalizeAngleSoft(this float angle)
+    {
+        return angle < -F_PI ? angle + F_TWO_PI
+            : angle > F_PI ? angle - F_TWO_PI
+            : angle;
+    }
+
     public static bool IsUnitAngle(this float angle) => angle >= -F_PI && angle <= F_PI;
 
     public static string Stringify(this float number, string end = "")

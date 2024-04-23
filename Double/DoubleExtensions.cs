@@ -1,18 +1,56 @@
 ﻿namespace Rotation3D.Double;
 
 using System.Numerics;
+using static DoubleConstants;
+using static Math;
 
 public static class DoubleExtensions
 {
-    public static DoubleAxisAngle ToDouble(this AxisAngle axisAngle) => new(axisAngle);
+    public static double NormalizeAngleHard(this double angle)
+    {
+        var normAngle = angle;
 
-    public static DoubleEulerAngles ToDouble(this EulerAngles eulerAngles) => new(eulerAngles);
+        if (normAngle < -PI)
+            do normAngle += TWO_PI;
+            while (normAngle < -PI);
+        else if (normAngle > PI)
+            do normAngle -= TWO_PI;
+            while (normAngle > PI);
 
-    public static DoubleMatrix4x4 ToDouble(this Matrix4x4 matrix) => new(matrix);
+        return normAngle;
+    }
 
-    public static DoubleQuaternion ToDouble(this Quaternion quaternion) => new(quaternion);
+    public static bool IsUnitAngle(this double angle) => angle >= -PI && angle <= PI;
 
-    public static DoubleVector3 ToDouble(this Vector3 vector) => new(vector);
+    //
+
+    public static DoubleAxisAngle ToDouble(this AxisAngle axisAngle)
+    {
+        return new(axisAngle.Axis.ToDouble(), axisAngle.Angle);
+    }
+
+    public static DoubleEulerAngles ToDouble(this EulerAngles eulerAngles)
+    {
+        return new(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
+    }
+
+    public static DoubleMatrix4x4 ToDouble(this Matrix4x4 matrix)
+    {
+        return new(matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+                   matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+                   matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+                   matrix.M41, matrix.M42, matrix.M43, matrix.M44);
+    }
+
+    public static DoubleQuaternion ToDouble(this Quaternion quaternion)
+    {
+        return new(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
+    }
+
+    public static DoubleVector3 ToDouble(this Vector3 vector)
+    {
+        return new(vector.X, vector.Y, vector.Z);
+    }
 
     //
 

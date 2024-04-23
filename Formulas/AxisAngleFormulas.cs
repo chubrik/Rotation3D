@@ -7,11 +7,18 @@ using static MathF;
 
 public static class AxisAngleFormulas
 {
-    public static AxisAngle Normalize(this AxisAngle axisAngle)
+    public static AxisAngle NormalizeSoft(this AxisAngle axisAngle)
     {
-        return new AxisAngle(
-            axis: axisAngle.Axis.Normalize(),
-            angle: axisAngle.Angle.NormalizeAngle());
+        var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
+
+        var sqLenAxis = x * x + y * y + z * z;
+
+        if (sqLenAxis == 0)
+            return AxisAngle.Zero;
+
+        var invLenAxis = 1f / Sqrt(sqLenAxis);
+        var normAngle = angle.NormalizeAngleSoft();
+        return new AxisAngle(x: x * invLenAxis, y: y * invLenAxis, z: z * invLenAxis, angle: normAngle);
     }
 
     public static EulerAngles UnitToEulerAngles(this AxisAngle axisAngle)
@@ -54,7 +61,7 @@ public static class AxisAngleFormulas
 
         #endregion
 
-        Debug.Assert(axisAngle.IsUnit());
+        Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
@@ -90,7 +97,7 @@ public static class AxisAngleFormulas
     {
         // Reference: Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
-        Debug.Assert(axisAngle.IsUnit());
+        Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
@@ -130,7 +137,7 @@ public static class AxisAngleFormulas
     {
         // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
 
-        Debug.Assert(axisAngle.IsUnit());
+        Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var halfAngle = angle * 0.5f;

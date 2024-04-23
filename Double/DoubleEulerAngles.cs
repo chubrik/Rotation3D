@@ -1,5 +1,6 @@
 ﻿namespace Rotation3D.Double;
 
+using System.Diagnostics;
 using static DoubleConstants;
 using static Math;
 
@@ -20,10 +21,6 @@ public readonly struct DoubleEulerAngles
     public readonly double PitchDegrees => Pitch * RAD_TO_DEG;
     public readonly double RollDegrees => Roll * RAD_TO_DEG;
 
-    public DoubleEulerAngles(EulerAngles eulerAngles)
-        : this(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll)
-    { }
-
     public DoubleEulerAngles(double yaw, double pitch, double roll)
     {
         Yaw = yaw;
@@ -36,13 +33,54 @@ public readonly struct DoubleEulerAngles
         return new DoubleEulerAngles(yaw * DEG_TO_RAD, pitch * DEG_TO_RAD, roll * DEG_TO_RAD);
     }
 
+    public bool IsValid() => Pitch >= -HALF_PI && Pitch <= HALF_PI;
+
+    public bool IsUnit() => IsValid() && Yaw.IsUnitAngle() && Roll.IsUnitAngle();
+
+    public DoubleEulerAngles NormalizeInvalidHard()
+    {
+        var normPitch = Pitch;
+
+        if (normPitch < -HALF_PI)
+            do normPitch += TWO_PI;
+            while (normPitch < -HALF_PI);
+        else if (normPitch > ONE_AND_HALF_PI)
+            do normPitch -= TWO_PI;
+            while (normPitch > ONE_AND_HALF_PI);
+
+        var yaw = Yaw;
+        var roll = Roll;
+
+        if (normPitch > HALF_PI)
+        {
+            yaw += PI;
+            normPitch = PI - normPitch;
+            roll += PI;
+        }
+
+        var normYaw = yaw.NormalizeAngleHard();
+        var normRoll = roll.NormalizeAngleHard();
+        return new DoubleEulerAngles(normYaw, normPitch, normRoll);
+    }
+
+    public DoubleEulerAngles NormalizeValidHard()
+    {
+        Debug.Assert(IsValid());
+        var normYaw = Yaw.NormalizeAngleHard();
+        var normRoll = Roll.NormalizeAngleHard();
+        return new DoubleEulerAngles(normYaw, Pitch, normRoll);
+    }
+
     public DoubleAxisAngle UnitToAxisAngle()
     {
+        Debug.Assert(IsUnit());
         throw new NotImplementedException();
     }
 
     public DoubleMatrix4x4 UnitToMatrix()
     {
+        Debug.Assert(IsUnit());
+
         var sy = Sin(Yaw);
         var cy = Cos(Yaw);
         var sp = Sin(Pitch);
@@ -72,6 +110,8 @@ public readonly struct DoubleEulerAngles
 
     public DoubleQuaternion UnitToQuaternion()
     {
+        Debug.Assert(IsUnit());
+
         var halfYaw = Yaw * 0.5;
         var halfPitch = Pitch * 0.5;
         var halfRoll = Roll * 0.5;

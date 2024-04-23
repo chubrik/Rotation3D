@@ -2,9 +2,9 @@
 
 public static class AxisAngleExtensions
 {
-    public static bool IsUnit(this AxisAngle axisAngle)
+    public static bool IsUnitAbout(this AxisAngle axisAngle)
     {
-        return axisAngle.Axis.IsUnit()
+        return axisAngle.Axis.IsUnitAbout()
             && axisAngle.Angle.IsUnitAngle();
     }
 

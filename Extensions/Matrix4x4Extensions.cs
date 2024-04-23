@@ -6,7 +6,7 @@ using static MathF;
 
 public static class Matrix4x4Extensions
 {
-    public static bool IsUnit(this Matrix4x4 matrix)
+    public static bool IsUnitAbout(this Matrix4x4 matrix)
     {
         var diff = matrix.DiffUnit();
         var isUnit = diff <= Constants.MatrixUnitMaxDiff;

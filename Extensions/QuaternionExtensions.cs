@@ -6,7 +6,7 @@ using static MathF;
 
 public static class QuaternionExtensions
 {
-    public static bool IsUnit(this Quaternion quaternion)
+    public static bool IsUnitAbout(this Quaternion quaternion)
     {
         var diff = quaternion.DiffUnit();
         var isUnit = diff <= Constants.QuaternionUnitMaxDiff;

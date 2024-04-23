@@ -4,8 +4,9 @@ using static Math;
 
 public static class DoubleConstants
 {
-    public const double HALF_PI = PI / 2.0;
+    public const double HALF_PI = PI * 0.5;
     public const double TWO_PI = PI * 2.0;
+    public const double ONE_AND_HALF_PI = PI * 1.5;
     public const double DEG_TO_RAD = PI / 180.0;
     public const double RAD_TO_DEG = 180.0 / PI;
     public const double SIN_NEAR_90 = 0.99999961922824943;
