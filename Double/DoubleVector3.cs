@@ -1,5 +1,6 @@
 ﻿namespace Rotation3D.Double;
 
+using System.Numerics;
 using static Math;
 
 public readonly struct DoubleVector3
@@ -19,10 +20,11 @@ public readonly struct DoubleVector3
 
     public double Length() => Sqrt(X * X + Y * Y + Z * Z);
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Vector3.Normalize(Vector3)"/>
+    /// </summary>
     public DoubleVector3 Normalize()
     {
-        // Reference: Vector3.Normalize(vector3);
-
         var sqLen = X * X + Y * Y + Z * Z;
 
         if (sqLen == 0)
@@ -32,5 +34,5 @@ public readonly struct DoubleVector3
         return new DoubleVector3(X * invLen, Y * invLen, Z * invLen);
     }
 
-    public double DiffUnit() => Abs(1.0 - Length());
+    public double UnitDiff() => Abs(1.0 - Length());
 }

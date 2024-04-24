@@ -8,7 +8,7 @@ public static class QuaternionExtensions
 {
     public static bool IsUnitAbout(this Quaternion quaternion)
     {
-        var diff = quaternion.DiffUnit();
+        var diff = quaternion.UnitDiff();
         var isUnit = diff <= Constants.QuaternionUnitMaxDiff;
 
         if (!isUnit)
@@ -17,9 +17,9 @@ public static class QuaternionExtensions
         return isUnit;
     }
 
-    public static float DiffUnit(this Quaternion quaternion)
+    public static float UnitDiff(this Quaternion quaternion)
     {
-        return (float)quaternion.ToDouble().DiffUnit();
+        return (float)quaternion.ToDouble().UnitDiff();
     }
 
     public static float Diff(this Quaternion q1, Quaternion q2)

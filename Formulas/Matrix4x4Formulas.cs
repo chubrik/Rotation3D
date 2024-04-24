@@ -7,6 +7,7 @@ using static MathF;
 
 public static class Matrix4x4Formulas
 {
+    [Obsolete("Need to prove")]
     public static EulerAngles UnitToEulerAngles(this Matrix4x4 matrix)
     {
         #region Explanations
@@ -79,7 +80,8 @@ public static class Matrix4x4Formulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    public static EulerAngles ScaledToEulerAngles_Ugly(this Matrix4x4 matrix)
+    [Obsolete("Draft")]
+    public static EulerAngles ScaledToEulerAngles_Draft(this Matrix4x4 matrix)
     {
         // Similar to the previous one, but supports a scaled matrix.
 
@@ -115,10 +117,11 @@ public static class Matrix4x4Formulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromRotationMatrix(Matrix4x4)"/>
+    /// </summary>
     public static Quaternion UnitToQuaternion(this Matrix4x4 matrix)
     {
-        // Reference: Quaternion.CreateFromRotationMatrix(matrix);
-
         Debug.Assert(matrix.IsUnitAbout());
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =

@@ -8,7 +8,7 @@ public static class Matrix4x4Extensions
 {
     public static bool IsUnitAbout(this Matrix4x4 matrix)
     {
-        var diff = matrix.DiffUnit();
+        var diff = matrix.UnitDiff();
         var isUnit = diff <= Constants.MatrixUnitMaxDiff;
 
         if (!isUnit)
@@ -17,9 +17,9 @@ public static class Matrix4x4Extensions
         return isUnit;
     }
 
-    public static float DiffUnit(this Matrix4x4 matrix)
+    public static float UnitDiff(this Matrix4x4 matrix)
     {
-        return (float)matrix.ToDouble().DiffUnit();
+        return (float)matrix.ToDouble().UnitDiff();
     }
 
     public static float Diff(this Matrix4x4 m1, Matrix4x4 m2)

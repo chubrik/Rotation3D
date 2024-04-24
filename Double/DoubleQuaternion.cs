@@ -1,5 +1,6 @@
 ﻿namespace Rotation3D.Double;
 
+using System.Numerics;
 using static Math;
 
 public readonly struct DoubleQuaternion
@@ -21,10 +22,13 @@ public readonly struct DoubleQuaternion
 
     public double Length() => Sqrt(X * X + Y * Y + Z * Z + W * W);
 
+    public double UnitDiff() => Abs(1.0 - Length());
+
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.Normalize(Quaternion)"/>
+    /// </summary>
     public DoubleQuaternion Normalize()
     {
-        // Reference: Quaternion.Normalize(quaternion);
-
         var sqLen = X * X + Y * Y + Z * Z + W * W;
 
         if (sqLen == 0)
@@ -34,24 +38,25 @@ public readonly struct DoubleQuaternion
         return new DoubleQuaternion(X * invLen, Y * invLen, Z * invLen, W * invLen);
     }
 
-    public double DiffUnit() => Abs(1.0 - Length());
-
+    [Obsolete("Need to prove")]
     public DoubleAxisAngle UnitToAxisAngle()
     {
         //todo assert unit
         throw new NotImplementedException();
     }
 
+    [Obsolete("Need to prove")]
     public DoubleEulerAngles UnitToEulerAngles()
     {
         //todo assert unit
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Matrix4x4.CreateFromQuaternion(Quaternion)"/>
+    /// </summary>
     public DoubleMatrix4x4 UnitToMatrix()
     {
-        /// Reference: Matrix4x4.CreateFromQuaternion(quaternion);
-
         //todo assert unit
         var xx = X * X;
         var yy = Y * Y;

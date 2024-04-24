@@ -7,7 +7,7 @@ public static class Vector3Extensions
 {
     public static bool IsUnitAbout(this Vector3 vector)
     {
-        var diff = vector.DiffUnit();
+        var diff = vector.UnitDiff();
         var isUnit = diff <= Constants.Vector3UnitMaxDiff;
 
         if (!isUnit)
@@ -16,8 +16,8 @@ public static class Vector3Extensions
         return isUnit;
     }
 
-    public static float DiffUnit(this Vector3 vector)
+    public static float UnitDiff(this Vector3 vector)
     {
-        return (float)vector.ToDouble().DiffUnit();
+        return (float)vector.ToDouble().UnitDiff();
     }
 }

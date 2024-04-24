@@ -1,5 +1,6 @@
 ﻿namespace Rotation3D.Double;
 
+using System.Numerics;
 using static DoubleConstants;
 using static Math;
 
@@ -35,6 +36,7 @@ public readonly struct DoubleAxisAngle
         return new DoubleAxisAngle(x, y, z, angle * DEG_TO_RAD);
     }
 
+    [Obsolete("Need to prove")]
     public DoubleAxisAngle NormalizeHard()
     {
         var sqLenAxis = X * X + Y * Y + Z * Z;
@@ -50,12 +52,16 @@ public readonly struct DoubleAxisAngle
         return new DoubleAxisAngle(x, y, z, angle);
     }
 
+    [Obsolete("Need to prove")]
     public DoubleEulerAngles UnitToEulerAngles()
     {
         //todo assert unit
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Matrix4x4.CreateFromAxisAngle(Vector3, float)"/>
+    /// </summary>
     public DoubleMatrix4x4 UnitToMatrix()
     {
         //todo assert unit
@@ -92,6 +98,9 @@ public readonly struct DoubleAxisAngle
         return matrix;
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromAxisAngle(Vector3, float)"/>
+    /// </summary>
     public DoubleQuaternion UnitToQuaternion()
     {
         //todo assert unit

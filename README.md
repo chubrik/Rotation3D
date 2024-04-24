@@ -5,22 +5,22 @@ Euler angles are right-handed with YXZ axis priority order,
 where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 <br><br>
 
-## Unit converting
+## Normalized source
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
-| **AxisAngle** | &nbsp;– | ✅ Tested | ✅ Tested | ✅ Tested |
-| **EulerAngles** | ❌ Not yet | &nbsp;– | ✅ Tested | ✅ Tested |
-| **Matrix4x4** | ❌ Not yet | ✅ Tested | &nbsp;– | ✅ Tested |
-| **Quaternion** | ⚠️ Draft | ✅ Tested | ✅ Tested | &nbsp;– |
+| **AxisAngle** | &nbsp;– | ⏳ Testing | ✅ Proved | ✅ Proved |
+| **EulerAngles** | ❌ Not yet | &nbsp;– | ✅ Proved | ✅ Proved |
+| **Matrix4x4** | ❌ Not yet | ⏳ Testing | &nbsp;– | ✅ Proved |
+| **Quaternion** | ⚠️ Draft | ⏳ Testing | ✅ Proved | &nbsp;– |
 
 <br>
 
-## Scaled converting
+## Not normalized source
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
 | **AxisAngle** | &nbsp;– | ❌ Not yet | ❌ Not yet | ❌ Not yet |
-| **EulerAngles** | &nbsp;– | &nbsp;– | &nbsp;– | &nbsp;– |
-| **Matrix4x4** | ❌ Not yet | ⚠️ Ugly | &nbsp;– | ❌ Not yet |
-| **Quaternion** | ❌ Not yet | ✅ Tested | ✅ Tested | &nbsp;– |
+| **EulerAngles** | ❌ Not yet | &nbsp;– | ❌ Not yet | ❌ Not yet |
+| **Matrix4x4** | ❌ Not yet | ⚠️ Draft | &nbsp;– | ❌ Not yet |
+| **Quaternion** | ❌ Not yet | ⏳ Testing | ✅ Proved | &nbsp;– |

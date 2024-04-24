@@ -4,6 +4,7 @@ using static Constants;
 
 public static class NumberExtensions
 {
+    [Obsolete("Need to prove")]
     public static float NormalizeAngleSoft(this float angle)
     {
         return angle < -F_PI ? angle + F_TWO_PI

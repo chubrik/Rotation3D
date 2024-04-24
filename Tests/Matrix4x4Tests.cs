@@ -14,7 +14,8 @@ public sealed class Matrix4x4Tests : TestsBase
             create: Randomizer.CreateUnitMatrix,
             toDouble: m => m,
             fromDouble: e => e,
-            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: m => m.Stringify(),
             resToString: e => e.Stringify(),
             calcDouble: m => EulerAngles.Identity, // No reason to convert
@@ -27,18 +28,19 @@ public sealed class Matrix4x4Tests : TestsBase
     }
 
     [TestMethod]
-    public void ScaledToEulerAngles_Ugly()
+    public void ScaledToEulerAngles_Draft()
     {
         var result = Prepare(
             create: Randomizer.CreateScaledMatrix,
             toDouble: m => m,
             fromDouble: e => e,
-            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().Normalize().UnitToQuaternion().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().Normalize().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: m => m.Stringify(),
             resToString: e => e.Stringify(),
             calcDouble: m => EulerAngles.Identity, // No reason to convert
             calcSystem: m => EulerAngles.Identity, // System has no solution
-            calcCustom: m => m.ScaledToEulerAngles_Ugly());
+            calcCustom: m => m.ScaledToEulerAngles_Draft());
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);

@@ -6,6 +6,9 @@ using static MathF;
 
 public static class EulerAnglesFormulas
 {
+    /// <summary>
+    /// ✔ Proved by test: <see cref="Tests.EulerAnglesTests.UnitToMatrix"/>
+    /// </summary>
     public static Matrix4x4 UnitToMatrix(this EulerAngles eulerAngles)
     {
         #region Explanations
@@ -79,10 +82,11 @@ public static class EulerAnglesFormulas
         return matrix;
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromYawPitchRoll(float, float, float)"/>
+    /// </summary>
     public static Quaternion UnitToQuaternion(this EulerAngles eulerAngles)
     {
-        // Reference: Quaternion.CreateFromYawPitchRoll(eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
-
         Debug.Assert(eulerAngles.IsUnit());
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 

@@ -7,6 +7,7 @@ using static MathF;
 
 public static class AxisAngleFormulas
 {
+    [Obsolete("Need to prove")]
     public static AxisAngle NormalizeSoft(this AxisAngle axisAngle)
     {
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
@@ -21,6 +22,7 @@ public static class AxisAngleFormulas
         return new AxisAngle(x: x * invLenAxis, y: y * invLenAxis, z: z * invLenAxis, angle: normAngle);
     }
 
+    [Obsolete("Need to prove")]
     public static EulerAngles UnitToEulerAngles(this AxisAngle axisAngle)
     {
         #region Explanations
@@ -92,11 +94,11 @@ public static class AxisAngleFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Matrix4x4.CreateFromAxisAngle(Vector3, float)"/>
+    /// </summary>
     public static Matrix4x4 UnitToMatrix(this AxisAngle axisAngle)
     {
-        // Reference: Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-
         Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
@@ -133,10 +135,11 @@ public static class AxisAngleFormulas
         return matrix;
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromAxisAngle(Vector3, float)"/>
+    /// </summary>
     public static Quaternion UnitToQuaternion(this AxisAngle axisAngle)
     {
-        // Reference: Quaternion.CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
-
         Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 

@@ -6,6 +6,7 @@ using static Math;
 
 public static class DoubleExtensions
 {
+    [Obsolete("Need to prove")]
     public static double NormalizeAngleHard(this double angle)
     {
         var normAngle = angle;
@@ -20,9 +21,9 @@ public static class DoubleExtensions
         return normAngle;
     }
 
-    public static bool IsUnitAngle(this double angle) => angle >= -PI && angle <= PI;
+    public static bool IsUnitAngle_F(this double angle) => angle >= -Constants.F_PI && angle <= Constants.F_PI;
 
-    //
+    #region System to Double
 
     public static DoubleAxisAngle ToDouble(this AxisAngle axisAngle)
     {
@@ -52,7 +53,9 @@ public static class DoubleExtensions
         return new(vector.X, vector.Y, vector.Z);
     }
 
-    //
+    #endregion
+
+    #region Double to System
 
     public static AxisAngle ToSystem(this DoubleAxisAngle axisAngle)
     {
@@ -81,4 +84,6 @@ public static class DoubleExtensions
     {
         return new((float)vector.X, (float)vector.Y, (float)vector.Z);
     }
+
+    #endregion
 }

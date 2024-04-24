@@ -7,10 +7,11 @@ using static MathF;
 
 public static class QuaternionFormulas
 {
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.Normalize(Quaternion)"/>
+    /// </summary>
     public static Quaternion Normalize(this Quaternion quaternion)
     {
-        // Reference: Quaternion.Normalize(quaternion);
-
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var sqLen = x * x + y * y + z * z + w * w;
@@ -22,6 +23,7 @@ public static class QuaternionFormulas
         return new Quaternion(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 
+    [Obsolete("Draft")]
     public static AxisAngle UnitToAxisAngle_Draft(this Quaternion quaternion)
     {
         #region Explanations
@@ -70,6 +72,7 @@ public static class QuaternionFormulas
         return new AxisAngle(x, y, z, angle);
     }
 
+    [Obsolete("Need to prove")]
     public static EulerAngles UnitToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
@@ -136,6 +139,7 @@ public static class QuaternionFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
+    [Obsolete("Need to prove")]
     public static EulerAngles ScaledToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
@@ -207,10 +211,11 @@ public static class QuaternionFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Matrix4x4.CreateFromQuaternion(Quaternion)"/>
+    /// </summary>
     public static Matrix4x4 UnitToMatrix(this Quaternion quaternion)
     {
-        // Reference: Matrix4x4.CreateFromQuaternion(quaternion);
-
         Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
@@ -242,6 +247,9 @@ public static class QuaternionFormulas
         return matrix;
     }
 
+    /// <summary>
+    /// ✔ Proved by test: <see cref="Tests.QuaternionTests.ScaledToMatrix"/>
+    /// </summary>
     public static Matrix4x4 ScaledToMatrix(this Quaternion quaternion)
     {
         #region Explanations

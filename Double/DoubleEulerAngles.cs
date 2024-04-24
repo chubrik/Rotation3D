@@ -1,6 +1,7 @@
 ﻿namespace Rotation3D.Double;
 
 using System.Diagnostics;
+using System.Numerics;
 using static DoubleConstants;
 using static Math;
 
@@ -33,10 +34,11 @@ public readonly struct DoubleEulerAngles
         return new DoubleEulerAngles(yaw * DEG_TO_RAD, pitch * DEG_TO_RAD, roll * DEG_TO_RAD);
     }
 
-    public bool IsValid() => Pitch >= -HALF_PI && Pitch <= HALF_PI;
+    public bool IsValid_F() => Pitch >= -Constants.F_HALF_PI && Pitch <= Constants.F_HALF_PI;
 
-    public bool IsUnit() => IsValid() && Yaw.IsUnitAngle() && Roll.IsUnitAngle();
+    public bool IsUnit_F() => IsValid_F() && Yaw.IsUnitAngle_F() && Roll.IsUnitAngle_F();
 
+    [Obsolete("Need to prove")]
     public DoubleEulerAngles NormalizeInvalidHard()
     {
         var normPitch = Pitch;
@@ -63,23 +65,28 @@ public readonly struct DoubleEulerAngles
         return new DoubleEulerAngles(normYaw, normPitch, normRoll);
     }
 
+    [Obsolete("Need to prove")]
     public DoubleEulerAngles NormalizeValidHard()
     {
-        Debug.Assert(IsValid());
+        Debug.Assert(IsValid_F());
         var normYaw = Yaw.NormalizeAngleHard();
         var normRoll = Roll.NormalizeAngleHard();
         return new DoubleEulerAngles(normYaw, Pitch, normRoll);
     }
 
+    [Obsolete("Need to prove")]
     public DoubleAxisAngle UnitToAxisAngle()
     {
-        Debug.Assert(IsUnit());
+        Debug.Assert(IsUnit_F());
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// ✔ Proved by test: <see cref="Tests.EulerAnglesTests.UnitToMatrix"/>
+    /// </summary>
     public DoubleMatrix4x4 UnitToMatrix()
     {
-        Debug.Assert(IsUnit());
+        Debug.Assert(IsUnit_F());
 
         var sy = Sin(Yaw);
         var cy = Cos(Yaw);
@@ -108,9 +115,12 @@ public readonly struct DoubleEulerAngles
         return matrix;
     }
 
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromYawPitchRoll(float, float, float)"/>
+    /// </summary>
     public DoubleQuaternion UnitToQuaternion()
     {
-        Debug.Assert(IsUnit());
+        Debug.Assert(IsUnit_F());
 
         var halfYaw = Yaw * 0.5;
         var halfPitch = Pitch * 0.5;

@@ -52,7 +52,8 @@ public sealed class QuaternionTests : TestsBase
             create: Randomizer.CreateScaledQuaternion,
             toDouble: q => q,
             fromDouble: e => e,
-            compare: (qSrc, eExp, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            compare: (qSrc, eExp, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             calcDouble: q => EulerAngles.Identity, // No reason to convert

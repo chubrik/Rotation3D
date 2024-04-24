@@ -14,7 +14,8 @@ public sealed class AxisAngleTests : TestsBase
             create: Randomizer.CreateUnitAxisAngle,
             toDouble: a => a,
             fromDouble: e => e,
-            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: a => a.Stringify(),
             resToString: e => e.Stringify(),
             calcDouble: a => EulerAngles.Identity, // No reason to convert

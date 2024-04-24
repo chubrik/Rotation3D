@@ -5,10 +5,11 @@ using static MathF;
 
 public static class Vector3Formulas
 {
+    /// <summary>
+    /// ✔ Proved by Microsoft: <see cref="Vector3.Normalize(Vector3)"/>
+    /// </summary>
     public static Vector3 Normalize(this Vector3 vector)
     {
-        // Reference: Vector3.Normalize(vector);
-
         var (x, y, z) = (vector.X, vector.Y, vector.Z);
 
         var sqLen = x * x + y * y + z * z;
