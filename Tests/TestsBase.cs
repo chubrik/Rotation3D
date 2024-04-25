@@ -59,9 +59,9 @@ public abstract class TestsBase
         sw = Stopwatch.StartNew();
 
         var sumDiffSystem = 0f;
-        var sumDiffCustom = 0f;
-
         var maxDiffSystem = 0f;
+    
+        var sumDiffCustom = 0f;
         var maxDiffCustom = 0f;
 
         TSrc maxDiffCustomSrc = srcSystem[0];
@@ -117,8 +117,81 @@ public abstract class TestsBase
 
         return new Result<TSrc, TRes>(
             avgDiffSystem: avgDiffSystem,
-            avgDiffCustom: avgDiffCustom,
             maxDiffSystem: maxDiffSystem,
+            avgDiffCustom: avgDiffCustom,
+            maxDiffCustom: maxDiffCustom
+        );
+    }
+
+    protected static Result<TSrc, TRes> Prepare<TSrc, TRes>(
+        Func<TSrc> create,
+        Func<TSrc, string> srcToString,
+        Func<TRes, string> resToString,
+        Func<TSrc, TRes, float> compare,
+        Func<TSrc, TRes> calcCustom)
+    {
+        var sw = Stopwatch.StartNew();
+
+        long initializeTime;
+        long calcCustomTime;
+        long finalizeTime;
+        var srcSystem = new TSrc[IterationCount];
+        var resCustom = new TRes[IterationCount];
+        TSrc srcItem;
+
+        for (int i = 0; i < IterationCount; i++)
+            srcSystem[i] = create();
+
+        initializeTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            resCustom[i] = calcCustom(srcSystem[i]);
+        calcCustomTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+
+        var sumDiffCustom = 0f;
+        var maxDiffCustom = 0f;
+
+        TSrc maxDiffCustomSrc = srcSystem[0];
+        TRes maxDiffCustomRes = resCustom[0];
+
+        for (int i = 0; i < IterationCount; i++)
+        {
+            srcItem = srcSystem[i];
+            var diffCustom = compare(srcItem, resCustom[i]);
+
+            sumDiffCustom += diffCustom;
+
+            if (maxDiffCustom < diffCustom)
+            {
+                maxDiffCustom = diffCustom;
+                maxDiffCustomSrc = srcSystem[i];
+                maxDiffCustomRes = resCustom[i];
+            }
+        }
+
+        var avgDiffCustom = sumDiffCustom / IterationCount;
+
+        finalizeTime = sw.ElapsedMilliseconds;
+
+        Console.WriteLine($"                        Iterations:  {IterationCount:N}");
+        Console.WriteLine($"                        Initialize:  {initializeTime,4} ms");
+        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Finalize:    {finalizeTime,4} ms");
+        Console.WriteLine();
+
+        Console.WriteLine($"Custom diff:  max: {maxDiffCustom.Stringify(","),-13}  avg: {avgDiffCustom.Stringify()}");
+        Console.WriteLine();
+
+        Console.WriteLine("== Worst for custom ==");
+        Console.WriteLine($"Source:  {"",12}   {srcToString(maxDiffCustomSrc)}");
+        Console.WriteLine($"Custom:  {maxDiffCustom.Stringify()}   {resToString(maxDiffCustomRes)}");
+
+        return new Result<TSrc, TRes>(
+            avgDiffSystem: float.NaN,
+            maxDiffSystem: float.NaN,
+            avgDiffCustom: avgDiffCustom,
             maxDiffCustom: maxDiffCustom
         );
     }
@@ -126,19 +199,19 @@ public abstract class TestsBase
     protected sealed class Result<TSrc, TRes>
     {
         public float AvgDiffSystem { get; }
-        public float AvgDiffCustom { get; }
         public float MaxDiffSystem { get; }
+        public float AvgDiffCustom { get; }
         public float MaxDiffCustom { get; }
 
         public Result(
             float avgDiffSystem,
-            float avgDiffCustom,
             float maxDiffSystem,
+            float avgDiffCustom,
             float maxDiffCustom)
         {
             AvgDiffSystem = avgDiffSystem;
-            AvgDiffCustom = avgDiffCustom;
             MaxDiffSystem = maxDiffSystem;
+            AvgDiffCustom = avgDiffCustom;
             MaxDiffCustom = maxDiffCustom;
         }
     }

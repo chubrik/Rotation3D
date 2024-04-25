@@ -72,7 +72,12 @@ public static class QuaternionFormulas
         return new AxisAngle(x, y, z, angle);
     }
 
-    [Obsolete("Need to prove")]
+    /// <summary>
+    /// ✔ Proved by tests:
+    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_MainZone"/>
+    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_MiddleZone"/>
+    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_PolarZone"/>
+    /// </summary>
     public static EulerAngles UnitToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
@@ -116,13 +121,13 @@ public static class QuaternionFormulas
         var halfSinPitch = x * w - y * z;
         float yaw, pitch, roll;
 
-        if (halfSinPitch > F_HALF_SIN_NEAR_90)
+        if (halfSinPitch > 0.4999999f) // 89.966°
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (halfSinPitch < -F_HALF_SIN_NEAR_90)
+        else if (halfSinPitch < -0.4999999f)
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
             pitch = -F_HALF_PI;
@@ -139,7 +144,12 @@ public static class QuaternionFormulas
         return new EulerAngles(yaw, pitch, roll);
     }
 
-    [Obsolete("Need to prove")]
+    /// <summary>
+    /// ✔ Proved by tests:
+    /// <br/><see cref="Tests.QuaternionTests.ScaledToEulerAngles_MainZone"/>
+    /// <br/><see cref="Tests.QuaternionTests.ScaledToEulerAngles_MiddleZone"/>
+    /// <br/><see cref="Tests.QuaternionTests.ScaledToEulerAngles_PolarZone"/>
+    /// </summary>
     public static EulerAngles ScaledToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
@@ -189,13 +199,13 @@ public static class QuaternionFormulas
         var halfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
         float yaw, pitch, roll;
 
-        if (halfSinPitch > F_HALF_SIN_NEAR_90)
+        if (halfSinPitch > 0.499999851f) // 89.956°
         {
             yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (halfSinPitch < -F_HALF_SIN_NEAR_90)
+        else if (halfSinPitch < -0.499999851f)
         {
             yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
             pitch = -F_HALF_PI;

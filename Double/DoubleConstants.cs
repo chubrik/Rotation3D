@@ -4,14 +4,11 @@ using static Math;
 
 public static class DoubleConstants
 {
-    public const double EULER_POLAR_PITCH_HEIGHT_DEG = 0.05;
     public const double HALF_PI = PI * 0.5; // < float
     public const double TWO_PI = PI * 2.0; // < float
     public const double ONE_AND_HALF_PI = PI * 1.5;
     public const double DEG_TO_RAD = PI / 180.0; // > float
     public const double RAD_TO_DEG = 180.0 / PI; // < float
-    public const double SIN_NEAR_90 = 0.99999961922824943; // < float
-    public const double HALF_SIN_NEAR_90 = 0.49999980961412471; // < float
 
     public static void SelfCheck()
     {
@@ -20,8 +17,6 @@ public static class DoubleConstants
         var checkDoubleTwoPi = 6.2831853071795862;
         var checkDoubleDegToRad = 0.017453292519943295;
         var checkDoubleRadToDeg = 57.295779513082323;
-        var checkDoubleSinNear90 = Sin((90 - EULER_POLAR_PITCH_HEIGHT_DEG) * DEG_TO_RAD);
-        var checkDoubleHalfSinNear90 = checkDoubleSinNear90 / 2.0;
 
         if (PI != checkDoublePi)
             throw new InvalidOperationException();
@@ -36,12 +31,6 @@ public static class DoubleConstants
             throw new InvalidOperationException();
 
         if (RAD_TO_DEG != checkDoubleRadToDeg)
-            throw new InvalidOperationException();
-
-        if (SIN_NEAR_90 != checkDoubleSinNear90)
-            throw new InvalidOperationException();
-
-        if (HALF_SIN_NEAR_90 != checkDoubleHalfSinNear90)
             throw new InvalidOperationException();
     }
 }

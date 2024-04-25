@@ -67,18 +67,18 @@ public static class AxisAngleFormulas
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
         var sa = Sin(angle);
-        var _ca = 1 - Cos(angle);
+        var _ca = 1f - Cos(angle);
         var xx = x * x;
         var sinPitch = x * sa - z * y * _ca;
         float yaw, pitch, roll;
 
-        if (sinPitch > F_SIN_NEAR_90)
+        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED)
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < -F_SIN_NEAR_90)
+        else if (sinPitch < -F_SIN_NEAR_90_UNAPPROVED)
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
             pitch = -F_HALF_PI;

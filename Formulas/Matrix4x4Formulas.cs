@@ -7,7 +7,12 @@ using static MathF;
 
 public static class Matrix4x4Formulas
 {
-    [Obsolete("Need to prove")]
+    /// <summary>
+    /// ✔ Proved by tests:
+    /// <br/><see cref="Tests.Matrix4x4Tests.UnitToEulerAngles_MainZone"/>
+    /// <br/><see cref="Tests.Matrix4x4Tests.UnitToEulerAngles_MiddleZone"/>
+    /// <br/><see cref="Tests.Matrix4x4Tests.UnitToEulerAngles_PolarZone"/>
+    /// </summary>
     public static EulerAngles UnitToEulerAngles(this Matrix4x4 matrix)
     {
         #region Explanations
@@ -58,13 +63,13 @@ public static class Matrix4x4Formulas
 
         float yaw, pitch, roll;
 
-        if (m32 < -F_SIN_NEAR_90)
+        if (m32 < -0.99999994f) // 89.980°
         {
             yaw = Atan2(-m13, m11);
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (m32 > F_SIN_NEAR_90)
+        else if (m32 > 0.99999994f)
         {
             yaw = Atan2(-m13, m11);
             pitch = -F_HALF_PI;
@@ -91,13 +96,13 @@ public static class Matrix4x4Formulas
         var sinPitch = -m32 / Sqrt(m31 * m31 + m32 * m32 + m33 * m33); // forward length
         float yaw, pitch, roll;
 
-        if (sinPitch > F_SIN_NEAR_90)
+        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED)
         {
             yaw = Atan2(-m13, m11);
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < -F_SIN_NEAR_90)
+        else if (sinPitch < -F_SIN_NEAR_90_UNAPPROVED)
         {
             yaw = Atan2(-m13, m11);
             pitch = -F_HALF_PI;

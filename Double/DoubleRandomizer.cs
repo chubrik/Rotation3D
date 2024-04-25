@@ -32,9 +32,7 @@ public static class DoubleRandomizer
         return eulerAngles;
     }
 
-    /// <summary>
-    /// Pitch ±0...45°
-    /// </summary>
+    /// <summary>Pitch ±0...45°</summary>
     public static DoubleEulerAngles CreateUnitEulerAngles_MainZone()
     {
         var yaw = CreateUnitAngle();
@@ -44,15 +42,12 @@ public static class DoubleRandomizer
         return eulerAngles;
     }
 
-    /// <summary>
-    /// Pitch ±45...89.9°
-    /// </summary>
+    /// <summary>Pitch ±45...89.8°</summary>
     public static DoubleEulerAngles CreateUnitEulerAngles_MiddleZone()
     {
-        const double polarPitchHeightDegForTest = EULER_POLAR_PITCH_HEIGHT_DEG * 2.0; // 0.1°
-        const double pitchRandomFactor = 45.0 - polarPitchHeightDegForTest; // 44.9
-        var rawPitchDeg = _random.NextDouble() * pitchRandomFactor * 2 - pitchRandomFactor; // ±44.9°
-        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + 45 : rawPitchDeg - 45; // ±45...89.9°
+        const double pitchRandomFactor = 44.8;
+        var rawPitchDeg = _random.NextDouble() * pitchRandomFactor * 2 - pitchRandomFactor; // ±44.8°
+        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + 45 : rawPitchDeg - 45; // ±45...89.8°
         var pitch = pitchDeg * DEG_TO_RAD;
 
         var yaw = CreateUnitAngle();
@@ -61,15 +56,13 @@ public static class DoubleRandomizer
         return eulerAngles;
     }
 
-    /// <summary>
-    /// Pitch ±89.9...90°
-    /// </summary>
+    /// <summary>Pitch ±89.8...90°</summary>
     public static DoubleEulerAngles CreateUnitEulerAngles_PolarZone()
     {
-        const double polarPitchHeightDegForTest = EULER_POLAR_PITCH_HEIGHT_DEG * 2.0; // 0.1°
+        const double polarPitchHeightDegForTest = 0.2;
         const double pitchShift = 90 - polarPitchHeightDegForTest;
-        var rawPitchDeg = _random.NextDouble() * polarPitchHeightDegForTest * 2 - polarPitchHeightDegForTest; // ±0.1°
-        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + pitchShift : rawPitchDeg - pitchShift; // ±89.9...90°
+        var rawPitchDeg = _random.NextDouble() * polarPitchHeightDegForTest * 2 - polarPitchHeightDegForTest; // ±0.2°
+        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + pitchShift : rawPitchDeg - pitchShift; // ±89.8...90°
         var pitch = pitchDeg * DEG_TO_RAD;
 
         var yaw = CreateUnitAngle();
@@ -123,6 +116,17 @@ public static class DoubleRandomizer
         var w = CreateUnitValue() * scale;
         var quaternion = new DoubleQuaternion(x, y, z, w);
         return quaternion;
+    }
+
+    public static DoubleQuaternion RandomScale(this DoubleQuaternion quaternion)
+    {
+        var scale = CreateFactor();
+        var x = quaternion.X * scale;
+        var y = quaternion.Y * scale;
+        var z = quaternion.Z * scale;
+        var w = quaternion.W * scale;
+        var scaledQuaternion = new DoubleQuaternion(x, y, z, w);
+        return scaledQuaternion;
     }
 
     private static DoubleVector3 CreateUnitVector3()

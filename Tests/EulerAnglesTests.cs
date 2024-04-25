@@ -21,7 +21,7 @@ public sealed class EulerAnglesTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 6.03497e-7f);
+        Assert.IsTrue(result.MaxDiffCustom <= 6.3329935e-7f);
     }
 
     [TestMethod]

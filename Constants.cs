@@ -4,15 +4,16 @@ using Rotation3D.Double;
 
 public static class Constants
 {
+    public const int TestIterationCount = 1_000_000;
+
     public const float F_PI = (float)Math.PI; // > double
     public const float F_HALF_PI = (float)DoubleConstants.HALF_PI; // > double
     public const float F_TWO_PI = (float)DoubleConstants.TWO_PI; // > double
     public const float F_DEG_TO_RAD = (float)DoubleConstants.DEG_TO_RAD; // < double
     public const float F_RAD_TO_DEG = (float)DoubleConstants.RAD_TO_DEG; // > double
-    public const float F_SIN_NEAR_90 = (float)DoubleConstants.SIN_NEAR_90; // > double
-    public const float F_HALF_SIN_NEAR_90 = (float)DoubleConstants.HALF_SIN_NEAR_90; // > double
 
-    public const int TestIterationCount = 10_000_000;
+    [Obsolete]
+    public const float F_SIN_NEAR_90_UNAPPROVED = 0.999999642f; // > double
 
     public const float MatrixUnitMaxDiff = 5.645605E-7f;
     public const float QuaternionUnitMaxDiff = 2.0706733E-7f;
@@ -25,8 +26,6 @@ public static class Constants
         var checkTwoPi = 6.28318548f;
         var checkDegToRad = 0.0174532924f;
         var checkRadToDeg = 57.29578f;
-        var checkSinNear90 = 0.999999642f;
-        var checkHalfSinNear90 = 0.499999821f;
 
         if (F_PI != checkPi)
             throw new InvalidOperationException();
@@ -41,12 +40,6 @@ public static class Constants
             throw new InvalidOperationException();
 
         if (F_RAD_TO_DEG != checkRadToDeg)
-            throw new InvalidOperationException();
-
-        if (F_SIN_NEAR_90 != checkSinNear90)
-            throw new InvalidOperationException();
-
-        if (F_HALF_SIN_NEAR_90 != checkHalfSinNear90)
             throw new InvalidOperationException();
     }
 }

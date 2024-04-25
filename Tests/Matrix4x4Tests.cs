@@ -8,21 +8,45 @@ using System.Numerics;
 public sealed class Matrix4x4Tests : TestsBase
 {
     [TestMethod]
-    public void UnitToEulerAngles()
+    public void UnitToEulerAngles_MainZone()
     {
         var result = Prepare(
-            create: Randomizer.CreateUnitMatrix,
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone().UnitToMatrix().ToSystem(),
             srcToString: m => m.Stringify(),
             resToString: e => e.Stringify(),
-            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcExact: m => EulerAngles.Identity,  // No reason to convert
-            calcSystem: m => EulerAngles.Identity, // System has no solution
+            compare: (mSrc, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00080254674f);
+        Assert.IsTrue(result.MaxDiffCustom <= 3.296882e-7f);
+    }
+
+    [TestMethod]
+    public void UnitToEulerAngles_MiddleZone()
+    {
+        var result = Prepare(
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone().UnitToMatrix().ToSystem(),
+            srcToString: m => m.Stringify(),
+            resToString: e => e.Stringify(),
+            compare: (mSrc, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcCustom: m => m.UnitToEulerAngles());
+
+        Assert.IsTrue(result.MaxDiffCustom <= 8.583069e-6f);
+    }
+
+    [TestMethod]
+    public void UnitToEulerAngles_PolarZone()
+    {
+        var result = Prepare(
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone().UnitToMatrix().ToSystem(),
+            srcToString: m => m.Stringify(),
+            resToString: e => e.Stringify(),
+            compare: (mSrc, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcCustom: m => m.UnitToEulerAngles());
+
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00024423003f);
     }
 
     [TestMethod]
