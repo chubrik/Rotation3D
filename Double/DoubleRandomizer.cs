@@ -26,7 +26,53 @@ public static class DoubleRandomizer
     public static DoubleEulerAngles CreateUnitEulerAngles()
     {
         var yaw = CreateUnitAngle();
-        var pitch = CreateUnitAngle() / 2.0;
+        var pitch = CreateUnitHalfAngle_F();
+        var roll = CreateUnitAngle();
+        var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
+        return eulerAngles;
+    }
+
+    /// <summary>
+    /// Pitch ±0...45°
+    /// </summary>
+    public static DoubleEulerAngles CreateUnitEulerAngles_MainZone()
+    {
+        var yaw = CreateUnitAngle();
+        var pitch = CreateUnitAngle() / 4.0; // ±0...45°
+        var roll = CreateUnitAngle();
+        var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
+        return eulerAngles;
+    }
+
+    /// <summary>
+    /// Pitch ±45...89.9°
+    /// </summary>
+    public static DoubleEulerAngles CreateUnitEulerAngles_MiddleZone()
+    {
+        const double polarPitchHeightDegForTest = EULER_POLAR_PITCH_HEIGHT_DEG * 2.0; // 0.1°
+        const double pitchRandomFactor = 45.0 - polarPitchHeightDegForTest; // 44.9
+        var rawPitchDeg = _random.NextDouble() * pitchRandomFactor * 2 - pitchRandomFactor; // ±44.9°
+        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + 45 : rawPitchDeg - 45; // ±45...89.9°
+        var pitch = pitchDeg * DEG_TO_RAD;
+
+        var yaw = CreateUnitAngle();
+        var roll = CreateUnitAngle();
+        var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
+        return eulerAngles;
+    }
+
+    /// <summary>
+    /// Pitch ±89.9...90°
+    /// </summary>
+    public static DoubleEulerAngles CreateUnitEulerAngles_PolarZone()
+    {
+        const double polarPitchHeightDegForTest = EULER_POLAR_PITCH_HEIGHT_DEG * 2.0; // 0.1°
+        const double pitchShift = 90 - polarPitchHeightDegForTest;
+        var rawPitchDeg = _random.NextDouble() * polarPitchHeightDegForTest * 2 - polarPitchHeightDegForTest; // ±0.1°
+        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + pitchShift : rawPitchDeg - pitchShift; // ±89.9...90°
+        var pitch = pitchDeg * DEG_TO_RAD;
+
+        var yaw = CreateUnitAngle();
         var roll = CreateUnitAngle();
         var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
         return eulerAngles;
@@ -108,6 +154,12 @@ public static class DoubleRandomizer
     private static double CreateUnitAngle()
     {
         var angle = _random.NextDouble() * TWO_PI - PI;
+        return angle;
+    }
+
+    private static double CreateUnitHalfAngle_F()
+    {
+        var angle = _random.NextDouble() * Constants.F_HALF_PI * 2.0 - Constants.F_HALF_PI;
         return angle;
     }
 

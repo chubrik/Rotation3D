@@ -4,13 +4,13 @@ using Rotation3D.Double;
 
 public static class Constants
 {
-    public const float F_PI = (float)Math.PI;
-    public const float F_HALF_PI = (float)DoubleConstants.HALF_PI;
-    public const float F_TWO_PI = (float)DoubleConstants.TWO_PI;
-    public const float F_DEG_TO_RAD = (float)DoubleConstants.DEG_TO_RAD;
-    public const float F_RAD_TO_DEG = (float)DoubleConstants.RAD_TO_DEG;
-    public const float F_SIN_NEAR_90 = (float)DoubleConstants.SIN_NEAR_90;
-    public const float F_HALF_SIN_NEAR_90 = (float)DoubleConstants.HALF_SIN_NEAR_90;
+    public const float F_PI = (float)Math.PI; // > double
+    public const float F_HALF_PI = (float)DoubleConstants.HALF_PI; // > double
+    public const float F_TWO_PI = (float)DoubleConstants.TWO_PI; // > double
+    public const float F_DEG_TO_RAD = (float)DoubleConstants.DEG_TO_RAD; // < double
+    public const float F_RAD_TO_DEG = (float)DoubleConstants.RAD_TO_DEG; // > double
+    public const float F_SIN_NEAR_90 = (float)DoubleConstants.SIN_NEAR_90; // > double
+    public const float F_HALF_SIN_NEAR_90 = (float)DoubleConstants.HALF_SIN_NEAR_90; // > double
 
     public const int TestIterationCount = 10_000_000;
 

@@ -12,12 +12,10 @@ public sealed class QuaternionTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitQuaternion,
-            toDouble: q => q,
-            fromDouble: a => a,
-            compare: (qSrc, aExp, aAct) => qSrc.Diff(aAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: q => q.Stringify(),
             resToString: a => a.Stringify(),
-            calcDouble: q => AxisAngle.Identity, // No reason to convert
+            compare: (qSrc, aExp, aAct) => qSrc.Diff(aAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: q => AxisAngle.Identity,  // No reason to convert
             calcSystem: q => AxisAngle.Identity, // System has no solution
             calcCustom: q => q.UnitToAxisAngle_Draft());
 
@@ -31,12 +29,10 @@ public sealed class QuaternionTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitQuaternion,
-            toDouble: q => q,
-            fromDouble: e => e,
-            compare: (qSrc, eExp, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
-            calcDouble: q => EulerAngles.Identity, // No reason to convert
+            compare: (qSrc, eExp, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: q => EulerAngles.Identity,  // No reason to convert
             calcSystem: q => EulerAngles.Identity, // System has no solution
             calcCustom: q => q.UnitToEulerAngles());
 
@@ -50,13 +46,11 @@ public sealed class QuaternionTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateScaledQuaternion,
-            toDouble: q => q,
-            fromDouble: e => e,
-            compare: (qSrc, eExp, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
-            calcDouble: q => EulerAngles.Identity, // No reason to convert
+            compare: (qSrc, eExp, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: q => EulerAngles.Identity,  // No reason to convert
             calcSystem: q => EulerAngles.Identity, // System has no solution
             calcCustom: q => q.ScaledToEulerAngles());
 
@@ -70,12 +64,10 @@ public sealed class QuaternionTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitQuaternion,
-            toDouble: q => q.ToDouble(),
-            fromDouble: m => m.ToSystem(),
-            compare: (_, q1, q2) => q1.Diff(q2),
             srcToString: q => q.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: q => q.UnitToMatrix(),
+            compare: (_, q1, q2) => q1.Diff(q2),
+            calcExact: q => q.ToDouble().UnitToMatrix().ToSystem(),
             calcSystem: Matrix4x4.CreateFromQuaternion,
             calcCustom: q => q.UnitToMatrix());
 
@@ -89,12 +81,10 @@ public sealed class QuaternionTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateScaledQuaternion,
-            toDouble: q => q.ToDouble(),
-            fromDouble: m => m.ToSystem(),
-            compare: (_, q1, q2) => q1.Diff(q2),
             srcToString: q => q.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: q => q.Normalize().UnitToMatrix(),
+            compare: (_, q1, q2) => q1.Diff(q2),
+            calcExact: q => q.ToDouble().Normalize().UnitToMatrix().ToSystem(),
             calcSystem: q => Matrix4x4.CreateFromQuaternion(Quaternion.Normalize(q)),
             calcCustom: q => q.ScaledToMatrix());
 

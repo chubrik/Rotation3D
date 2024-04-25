@@ -12,13 +12,11 @@ public sealed class Matrix4x4Tests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitMatrix,
-            toDouble: m => m,
-            fromDouble: e => e,
-            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: m => m.Stringify(),
             resToString: e => e.Stringify(),
-            calcDouble: m => EulerAngles.Identity, // No reason to convert
+            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: m => EulerAngles.Identity,  // No reason to convert
             calcSystem: m => EulerAngles.Identity, // System has no solution
             calcCustom: m => m.UnitToEulerAngles());
 
@@ -32,13 +30,11 @@ public sealed class Matrix4x4Tests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateScaledMatrix,
-            toDouble: m => m,
-            fromDouble: e => e,
-            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().Normalize().UnitToQuaternion().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: m => m.Stringify(),
             resToString: e => e.Stringify(),
-            calcDouble: m => EulerAngles.Identity, // No reason to convert
+            compare: (mSrc, eExp, eAct) => mSrc.ToDouble().Normalize().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: m => EulerAngles.Identity,  // No reason to convert
             calcSystem: m => EulerAngles.Identity, // System has no solution
             calcCustom: m => m.ScaledToEulerAngles_Draft());
 
@@ -52,12 +48,10 @@ public sealed class Matrix4x4Tests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitMatrix,
-            toDouble: m => m.ToDouble(),
-            fromDouble: q => q.ToSystem(),
-            compare: (_, m1, m2) => m1.Diff(m2),
             srcToString: m => m.Stringify(),
             resToString: q => q.Stringify(),
-            calcDouble: m => m.UnitToQuaternion(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            calcExact: m => m.ToDouble().UnitToQuaternion().ToSystem(),
             calcSystem: Quaternion.CreateFromRotationMatrix,
             calcCustom: m => m.UnitToQuaternion());
 

@@ -12,13 +12,11 @@ public sealed class AxisAngleTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitAxisAngle,
-            toDouble: a => a,
-            fromDouble: e => e,
-            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
             srcToString: a => a.Stringify(),
             resToString: e => e.Stringify(),
-            calcDouble: a => EulerAngles.Identity, // No reason to convert
+            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
+                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
+            calcExact: a => EulerAngles.Identity,  // No reason to convert
             calcSystem: a => EulerAngles.Identity, // System has no solution
             calcCustom: a => a.UnitToEulerAngles());
 
@@ -32,12 +30,10 @@ public sealed class AxisAngleTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitAxisAngle,
-            toDouble: a => a.ToDouble(),
-            fromDouble: m => m.ToSystem(),
-            compare: (_, m1, m2) => m1.Diff(m2),
             srcToString: a => a.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: a => a.UnitToMatrix(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            calcExact: a => a.ToDouble().UnitToMatrix().ToSystem(),
             calcSystem: a => Matrix4x4.CreateFromAxisAngle(a.Axis, a.Angle),
             calcCustom: a => a.UnitToMatrix());
 
@@ -51,12 +47,10 @@ public sealed class AxisAngleTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitAxisAngle,
-            toDouble: a => a.ToDouble(),
-            fromDouble: m => m.ToSystem(),
-            compare: (_, m1, m2) => m1.Diff(m2),
             srcToString: a => a.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: a => a.UnitToQuaternion(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            calcExact: a => a.ToDouble().UnitToQuaternion().ToSystem(),
             calcSystem: a => Quaternion.CreateFromAxisAngle(a.Axis, a.Angle),
             calcCustom: a => a.UnitToQuaternion());
 

@@ -12,12 +12,10 @@ public sealed class EulerAnglesTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitEulerAngles,
-            toDouble: e => e.ToDouble(),
-            fromDouble: m => m.ToSystem(),
-            compare: (_, m1, m2) => m1.Diff(m2),
             srcToString: e => e.Stringify(),
             resToString: m => m.Stringify(),
-            calcDouble: e => e.UnitToMatrix(),
+            compare: (_, m1, m2) => m1.Diff(m2),
+            calcExact: e => e.ToDouble().UnitToMatrix().ToSystem(),
             calcSystem: e => Matrix4x4.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
             calcCustom: e => e.UnitToMatrix());
 
@@ -31,12 +29,10 @@ public sealed class EulerAnglesTests : TestsBase
     {
         var result = Prepare(
             create: Randomizer.CreateUnitEulerAngles,
-            toDouble: e => e.ToDouble(),
-            fromDouble: q => q.ToSystem(),
-            compare: (_, q1, q2) => q1.Diff(q2),
             srcToString: e => e.Stringify(),
             resToString: q => q.Stringify(),
-            calcDouble: e => e.UnitToQuaternion(),
+            compare: (_, q1, q2) => q1.Diff(q2),
+            calcExact: e => e.ToDouble().UnitToQuaternion().ToSystem(),
             calcSystem: e => Quaternion.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
             calcCustom: e => e.UnitToQuaternion());
 

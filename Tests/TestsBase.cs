@@ -21,44 +21,30 @@ public abstract class TestsBase
         }
     }
 
-    protected static Result<TSrc, TRes> Prepare<TSrc, TSrcDouble, TRes, TResDouble>(
+    protected static Result<TSrc, TRes> Prepare<TSrc, TRes>(
         Func<TSrc> create,
-        Func<TSrc, TSrcDouble> toDouble,
-        Func<TResDouble, TRes> fromDouble,
-        Func<TSrc, TRes, TRes, float> compare,
         Func<TSrc, string> srcToString,
         Func<TRes, string> resToString,
-        Func<TSrcDouble, TResDouble> calcDouble,
+        Func<TSrc, TRes, TRes, float> compare,
+        Func<TSrc, TRes> calcExact,
         Func<TSrc, TRes> calcSystem,
         Func<TSrc, TRes> calcCustom)
     {
         var sw = Stopwatch.StartNew();
 
         long initializeTime;
-        long calcDoubleTime;
         long calcSystemTime;
         long calcCustomTime;
         long finalizeTime;
         var srcSystem = new TSrc[IterationCount];
-        var srcDouble = new TSrcDouble[IterationCount];
-        var resDouble = new TResDouble[IterationCount];
         var resSystem = new TRes[IterationCount];
         var resCustom = new TRes[IterationCount];
         TSrc srcItem;
 
         for (int i = 0; i < IterationCount; i++)
-        {
-            srcItem = create();
-            srcSystem[i] = srcItem;
-            srcDouble[i] = toDouble(srcItem);
-        }
+            srcSystem[i] = create();
 
         initializeTime = sw.ElapsedMilliseconds;
-
-        sw = Stopwatch.StartNew();
-        for (int i = 0; i < IterationCount; i++)
-            resDouble[i] = calcDouble(srcDouble[i]);
-        calcDoubleTime = sw.ElapsedMilliseconds;
 
         sw = Stopwatch.StartNew();
         for (int i = 0; i < IterationCount; i++)
@@ -79,7 +65,7 @@ public abstract class TestsBase
         var maxDiffCustom = 0f;
 
         TSrc maxDiffCustomSrc = srcSystem[0];
-        TRes maxDiffCustomResDouble = fromDouble(resDouble[0]);
+        TRes maxDiffCustomResDouble = calcExact(srcSystem[0]);
         TRes maxDiffCustomResSystem = resSystem[0];
         TRes maxDiffCustomRes = resCustom[0];
         var maxDiffCustomSystem = 0f;
@@ -87,7 +73,7 @@ public abstract class TestsBase
         for (int i = 0; i < IterationCount; i++)
         {
             srcItem = srcSystem[i];
-            var itemDouble = fromDouble(resDouble[i]);
+            var itemDouble = calcExact(srcItem);
             var diffSystem = compare(srcItem, itemDouble, resSystem[i]);
             var diffCustom = compare(srcItem, itemDouble, resCustom[i]);
 
@@ -113,11 +99,10 @@ public abstract class TestsBase
 
         finalizeTime = sw.ElapsedMilliseconds;
 
-        var calculationTime = calcDoubleTime + calcSystemTime + calcCustomTime;
-        Console.WriteLine($"Calc double: {calcDoubleTime,4} ms    Iterations:   {IterationCount:N}");
-        Console.WriteLine($"Calc system: {calcSystemTime,4} ms    Initialize:   {initializeTime,4} ms");
-        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Calculation:  {calculationTime,4} ms");
-        Console.WriteLine($"                        Finalize:     {finalizeTime,4} ms");
+        var calculationTime = calcSystemTime + calcCustomTime;
+        Console.WriteLine($"Calculation: {calculationTime,4} ms    Iterations:  {IterationCount:N}");
+        Console.WriteLine($"Calc system: {calcSystemTime,4} ms    Initialize:  {initializeTime,4} ms");
+        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Finalize:    {finalizeTime,4} ms");
         Console.WriteLine();
 
         Console.WriteLine($"System diff:  max: {maxDiffSystem.Stringify(","),-13}  avg: {avgDiffSystem.Stringify()}");
