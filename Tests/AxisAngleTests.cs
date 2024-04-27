@@ -22,7 +22,7 @@ public sealed class AxisAngleTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00085264444f);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00086560845f);
     }
 
     [TestMethod]

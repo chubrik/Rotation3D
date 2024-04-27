@@ -14,12 +14,7 @@ public static class QuaternionFormulas
     {
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        var sqLen = x * x + y * y + z * z + w * w;
-
-        if (sqLen == 0)
-            return Quaternion.Zero;
-
-        var invLen = 1f / Sqrt(sqLen);
+        var invLen = 1f / Sqrt(x * x + y * y + z * z + w * w);
         return new Quaternion(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 

@@ -10,16 +10,9 @@ public static class AxisAngleFormulas
     [Obsolete("Need to prove")]
     public static AxisAngle NormalizeSoft(this AxisAngle axisAngle)
     {
-        var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
-
-        var sqLenAxis = x * x + y * y + z * z;
-
-        if (sqLenAxis == 0)
-            return AxisAngle.Zero;
-
-        var invLenAxis = 1f / Sqrt(sqLenAxis);
-        var normAngle = angle.NormalizeAngleSoft();
-        return new AxisAngle(x: x * invLenAxis, y: y * invLenAxis, z: z * invLenAxis, angle: normAngle);
+        var axis = axisAngle.Axis.Normalize();
+        var angle = axisAngle.Angle.NormalizeAngleSoft();
+        return new AxisAngle(axis, angle);
     }
 
     [Obsolete("Need to prove")]

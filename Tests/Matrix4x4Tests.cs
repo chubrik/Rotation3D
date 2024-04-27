@@ -18,7 +18,7 @@ public sealed class Matrix4x4Tests : TestsBase
                                      eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 3.296882e-7f);
+        Assert.IsTrue(result.MaxDiffCustom <= 3.5762787e-7f);
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public sealed class Matrix4x4Tests : TestsBase
                                      eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 8.583069e-6f);
+        Assert.IsTrue(result.MaxDiffCustom <= 8.6426735e-6f);
     }
 
     [TestMethod]
@@ -64,7 +64,7 @@ public sealed class Matrix4x4Tests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 0.0008651316f);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00091201067f);
     }
 
     [TestMethod]

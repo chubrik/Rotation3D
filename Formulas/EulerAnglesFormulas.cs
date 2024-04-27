@@ -62,18 +62,18 @@ public static class EulerAnglesFormulas
         var sr = Sin(roll);
         var cr = Cos(roll);
 
-        var sysp = sy * sp;
-        var cysp = cy * sp;
+        var sy_sp = sy * sp;
+        var cy_sp = cy * sp;
 
         var matrix = Matrix4x4.Identity;
 
-        matrix.M11 = sysp * sr + cy * cr;
+        matrix.M11 = sy_sp * sr + cy * cr;
         matrix.M12 = cp * sr;
-        matrix.M13 = cysp * sr - sy * cr;
+        matrix.M13 = cy_sp * sr - sy * cr;
 
-        matrix.M21 = sysp * cr - cy * sr;
+        matrix.M21 = sy_sp * cr - cy * sr;
         matrix.M22 = cp * cr;
-        matrix.M23 = cysp * cr + sy * sr;
+        matrix.M23 = cy_sp * cr + sy * sr;
 
         matrix.M31 = sy * cp;
         matrix.M32 = -sp;
@@ -101,15 +101,15 @@ public static class EulerAnglesFormulas
         var sr = Sin(halfRoll);
         var cr = Cos(halfRoll);
 
-        var sysp = sy * sp;
-        var sycp = sy * cp;
-        var cysp = cy * sp;
-        var cycp = cy * cp;
+        var sy_sp = sy * sp;
+        var sy_cp = sy * cp;
+        var cy_sp = cy * sp;
+        var cy_cp = cy * cp;
 
-        var x = cysp * cr + sycp * sr;
-        var y = sycp * cr - cysp * sr;
-        var z = cycp * sr - sysp * cr;
-        var w = cycp * cr + sysp * sr;
+        var x = cy_sp * cr + sy_cp * sr;
+        var y = sy_cp * cr - cy_sp * sr;
+        var z = cy_cp * sr - sy_sp * cr;
+        var w = cy_cp * cr + sy_sp * sr;
 
         return new Quaternion(x, y, z, w);
     }

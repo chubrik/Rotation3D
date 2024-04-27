@@ -29,12 +29,7 @@ public readonly struct DoubleQuaternion
     /// </summary>
     public DoubleQuaternion Normalize()
     {
-        var sqLen = X * X + Y * Y + Z * Z + W * W;
-
-        if (sqLen == 0)
-            return Zero;
-
-        var invLen = 1.0 / Sqrt(sqLen);
+        var invLen = 1.0 / Sqrt(X * X + Y * Y + Z * Z + W * W);
         return new DoubleQuaternion(X * invLen, Y * invLen, Z * invLen, W * invLen);
     }
 

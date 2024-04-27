@@ -25,12 +25,7 @@ public readonly struct DoubleVector3
     /// </summary>
     public DoubleVector3 Normalize()
     {
-        var sqLen = X * X + Y * Y + Z * Z;
-
-        if (sqLen == 0)
-            return Zero;
-
-        var invLen = 1.0 / Sqrt(sqLen);
+        var invLen = 1.0 / Sqrt(X * X + Y * Y + Z * Z);
         return new DoubleVector3(X * invLen, Y * invLen, Z * invLen);
     }
 

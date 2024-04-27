@@ -81,6 +81,12 @@ public static class DoubleRandomizer
     public static DoubleMatrix4x4 CreateScaledMatrix()
     {
         var matrix = CreateUnitMatrix();
+        var scaledMatrix = matrix.RandomScale();
+        return scaledMatrix;
+    }
+
+    public static DoubleMatrix4x4 RandomScale(this DoubleMatrix4x4 matrix)
+    {
         var scaleX = CreateFactor();
         var scaleY = CreateFactor();
         var scaleZ = CreateFactor();
@@ -167,9 +173,10 @@ public static class DoubleRandomizer
         return angle;
     }
 
+    // 0.000 001 ... 1 000 000
     private static double CreateFactor()
     {
-        var factor = Pow(10, _random.NextDouble() * 6.0 - 3.0);
+        var factor = Pow(10, _random.NextDouble() * 12.0 - 6.0);
         return factor;
     }
 }

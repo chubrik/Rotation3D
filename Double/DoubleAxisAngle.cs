@@ -39,17 +39,9 @@ public readonly struct DoubleAxisAngle
     [Obsolete("Need to prove")]
     public DoubleAxisAngle NormalizeHard()
     {
-        var sqLenAxis = X * X + Y * Y + Z * Z;
-
-        if (sqLenAxis == 0)
-            return Zero;
-
-        var invLenAxis = 1.0 / Sqrt(sqLenAxis);
-        var x = X * invLenAxis;
-        var y = Y * invLenAxis;
-        var z = Z * invLenAxis;
+        var axis = Axis.Normalize();
         var angle = Angle.NormalizeAngleHard();
-        return new DoubleAxisAngle(x, y, z, angle);
+        return new DoubleAxisAngle(axis, angle);
     }
 
     [Obsolete("Need to prove")]

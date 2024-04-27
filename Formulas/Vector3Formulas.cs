@@ -12,12 +12,7 @@ public static class Vector3Formulas
     {
         var (x, y, z) = (vector.X, vector.Y, vector.Z);
 
-        var sqLen = x * x + y * y + z * z;
-
-        if (sqLen == 0)
-            return Vector3.Zero;
-
-        var invLen = 1f / Sqrt(sqLen);
+        var invLen = 1f / Sqrt(x * x + y * y + z * z);
         return new Vector3(x * invLen, y * invLen, z * invLen);
     }
 }

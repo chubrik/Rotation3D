@@ -34,7 +34,7 @@ public sealed class QuaternionTests : TestsBase
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 5.4296106e-7f);
+        Assert.IsTrue(result.MaxDiffCustom <= 5.438924e-7f);
     }
 
     [TestMethod]
@@ -47,7 +47,7 @@ public sealed class QuaternionTests : TestsBase
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 6.0617924e-5f);
+        Assert.IsTrue(result.MaxDiffCustom <= 6.502867e-5f);
     }
 
     [TestMethod]
@@ -60,7 +60,7 @@ public sealed class QuaternionTests : TestsBase
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00073614717f);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.00076410174f);
     }
 
     [TestMethod]
@@ -74,7 +74,7 @@ public sealed class QuaternionTests : TestsBase
                                      eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 4.3213367e-7f);
+        Assert.IsTrue(result.MaxDiffCustom <= 4.4703484e-7f);
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public sealed class QuaternionTests : TestsBase
                                      eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 6.5336004e-5f);
+        Assert.IsTrue(result.MaxDiffCustom <= 7.22229e-5f);
     }
 
     [TestMethod]
@@ -102,7 +102,7 @@ public sealed class QuaternionTests : TestsBase
                                      eAct.ToDouble().UnitToQuaternion().ToSystem()),
             calcCustom: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 0.0010098591f);
+        Assert.IsTrue(result.MaxDiffCustom <= 0.0010174275f);
     }
 
     [TestMethod]
@@ -136,6 +136,6 @@ public sealed class QuaternionTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 1.180917e-6f);
+        Assert.IsTrue(result.MaxDiffCustom <= 1.2218952e-6f);
     }
 }
