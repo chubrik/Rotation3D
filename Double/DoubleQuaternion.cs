@@ -22,6 +22,8 @@ public readonly struct DoubleQuaternion
 
     public double Length() => Sqrt(X * X + Y * Y + Z * Z + W * W);
 
+    public DoubleQuaternion Negate() => new(-X, -Y, -Z, -W);
+
     public double UnitDiff() => Abs(1.0 - Length());
 
     /// <summary>
@@ -58,25 +60,25 @@ public readonly struct DoubleQuaternion
         var zz = Z * Z;
 
         var xy = X * Y;
-        var xz = X * Z;
-        var xw = X * W;
+        var wz = Z * W;
+        var xz = Z * X;
+        var wy = Y * W;
         var yz = Y * Z;
-        var yw = Y * W;
-        var zw = Z * W;
+        var wx = X * W;
 
         var matrix = DoubleMatrix4x4.Identity;
 
-        matrix.M11 = 1.0 - (yy + zz) * 2.0;
-        matrix.M12 = (xy + zw) * 2.0;
-        matrix.M13 = (xz - yw) * 2.0;
+        matrix.M11 = 1.0 - 2.0 * (yy + zz);
+        matrix.M12 = 2.0 * (xy + wz);
+        matrix.M13 = 2.0 * (xz - wy);
 
-        matrix.M21 = (xy - zw) * 2.0;
-        matrix.M22 = 1.0 - (xx + zz) * 2.0;
-        matrix.M23 = (xw + yz) * 2.0;
+        matrix.M21 = 2.0 * (xy - wz);
+        matrix.M22 = 1.0 - 2.0 * (zz + xx);
+        matrix.M23 = 2.0 * (yz + wx);
 
-        matrix.M31 = (xz + yw) * 2.0;
-        matrix.M32 = (yz - xw) * 2.0;
-        matrix.M33 = 1.0 - (xx + yy) * 2.0;
+        matrix.M31 = 2.0 * (xz + wy);
+        matrix.M32 = 2.0 * (yz - wx);
+        matrix.M33 = 1.0 - 2.0 * (yy + xx);
 
         return matrix;
     }

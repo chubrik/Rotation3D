@@ -66,28 +66,21 @@ public readonly struct DoubleAxisAngle
         var xz = X * Z;
         var yz = Y * Z;
 
-        var xy_caxy = xy - xy * ca;
-        var xz_caxz = xz - xz * ca;
-        var yz_cayz = yz - yz * ca;
-        var xsa = X * sa;
-        var ysa = Y * sa;
-        var zsa = Z * sa;
+        var result = DoubleMatrix4x4.Identity;
 
-        var matrix = DoubleMatrix4x4.Identity;
+        result.M11 = xx + ca * (1.0f - xx);
+        result.M12 = xy - ca * xy + sa * Z;
+        result.M13 = xz - ca * xz - sa * Y;
 
-        matrix.M11 = xx + ca * (1.0 - xx);
-        matrix.M12 = xy_caxy + zsa;
-        matrix.M13 = xz_caxz - ysa;
+        result.M21 = xy - ca * xy - sa * Z;
+        result.M22 = yy + ca * (1.0f - yy);
+        result.M23 = yz - ca * yz + sa * X;
 
-        matrix.M21 = xy_caxy - zsa;
-        matrix.M22 = yy + ca * (1.0 - yy);
-        matrix.M23 = yz_cayz + xsa;
+        result.M31 = xz - ca * xz + sa * Y;
+        result.M32 = yz - ca * yz - sa * X;
+        result.M33 = zz + ca * (1.0f - zz);
 
-        matrix.M31 = xz_caxz + ysa;
-        matrix.M32 = yz_cayz - xsa;
-        matrix.M33 = zz + ca * (1.0 - zz);
-
-        return matrix;
+        return result;
     }
 
     /// <summary>
@@ -97,12 +90,13 @@ public readonly struct DoubleAxisAngle
     {
         //todo assert unit
         var halfAngle = Angle * 0.5;
-        var sa = Sin(halfAngle);
+        var s = Sin(halfAngle);
+        var c = Cos(halfAngle);
 
-        var qX = X * sa;
-        var qY = Y * sa;
-        var qZ = Z * sa;
-        var qW = Cos(halfAngle);
+        var qX = X * s;
+        var qY = Y * s;
+        var qZ = Z * s;
+        var qW = c;
 
         return new DoubleQuaternion(qX, qY, qZ, qW);
     }

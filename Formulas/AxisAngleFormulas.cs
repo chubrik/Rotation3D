@@ -56,6 +56,8 @@ public static class AxisAngleFormulas
 
         #endregion
 
+        // todo Tune operations order
+
         Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 
@@ -92,6 +94,8 @@ public static class AxisAngleFormulas
     /// </summary>
     public static Matrix4x4 UnitToMatrix(this AxisAngle axisAngle)
     {
+        // Checked operations order
+
         Debug.Assert(axisAngle.IsUnitAbout());
         var (x, y, z, angle) = (axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle);
 

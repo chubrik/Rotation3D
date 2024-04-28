@@ -122,34 +122,38 @@ public struct DoubleMatrix4x4
 
         if (trace > 0.0)
         {
-            w = Sqrt(1.0 + trace) * 0.5;
-            var invS = 0.25 / w;
-            x = (M23 - M32) * invS;
-            y = (M31 - M13) * invS;
-            z = (M12 - M21) * invS;
+            var s = Sqrt(trace + 1.0);
+            w = s * 0.5;
+            s = 0.5 / s;
+            x = (M23 - M32) * s;
+            y = (M31 - M13) * s;
+            z = (M12 - M21) * s;
         }
         else if (M11 >= M22 && M11 >= M33)
         {
-            x = Sqrt(1.0 + M11 - M22 - M33) * 0.5;
-            var invS = 0.25 / x;
+            var s = Sqrt(1.0 + M11 - M22 - M33);
+            var invS = 0.5 / s;
+            x = 0.5 * s;
             y = (M12 + M21) * invS;
             z = (M13 + M31) * invS;
             w = (M23 - M32) * invS;
         }
         else if (M22 > M33)
         {
-            y = Sqrt(1.0 + M22 - M11 - M33) * 0.5;
-            var invS = 0.25 / y;
+            var s = Sqrt(1.0 + M22 - M11 - M33);
+            var invS = 0.5 / s;
             x = (M21 + M12) * invS;
+            y = 0.5 * s;
             z = (M32 + M23) * invS;
             w = (M31 - M13) * invS;
         }
         else
         {
-            z = Sqrt(1.0 + M33 - M11 - M22) * 0.5;
-            var invS = 0.25 / z;
+            var s = Sqrt(1.0 + M33 - M11 - M22);
+            var invS = 0.5 / s;
             x = (M31 + M13) * invS;
             y = (M32 + M23) * invS;
+            z = 0.5 * s;
             w = (M12 - M21) * invS;
         }
 

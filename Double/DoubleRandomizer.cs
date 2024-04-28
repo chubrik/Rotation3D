@@ -124,15 +124,25 @@ public static class DoubleRandomizer
         return quaternion;
     }
 
-    public static DoubleQuaternion RandomScale(this DoubleQuaternion quaternion)
+    public static DoubleQuaternion RandomScaleAndSign(this DoubleQuaternion quaternion)
     {
         var scale = CreateFactor();
+        var sign = _random.NextSingle();
         var x = quaternion.X * scale;
         var y = quaternion.Y * scale;
         var z = quaternion.Z * scale;
         var w = quaternion.W * scale;
-        var scaledQuaternion = new DoubleQuaternion(x, y, z, w);
-        return scaledQuaternion;
+
+        if (sign < 0.5f)
+            return new DoubleQuaternion(x, y, z, w);
+        else
+            return new DoubleQuaternion(-x, -y, -z, -w);
+    }
+
+    public static DoubleQuaternion RandomSign(this DoubleQuaternion quaternion)
+    {
+        var sign = _random.NextSingle();
+        return sign < 0.5f ? quaternion : quaternion.Negate();
     }
 
     private static DoubleVector3 CreateUnitVector3()

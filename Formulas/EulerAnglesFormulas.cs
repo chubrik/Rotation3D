@@ -49,6 +49,7 @@ public static class EulerAnglesFormulas
         // 1. Flip matrix:  [10  11  12] => [-32  22 -12]
         //                  [20  21  22]    [-31 -21  11]
         // 2. Flip roll
+        // 3. Checked operations order
 
         #endregion
 
@@ -87,6 +88,8 @@ public static class EulerAnglesFormulas
     /// </summary>
     public static Quaternion UnitToQuaternion(this EulerAngles eulerAngles)
     {
+        // Tuned operations order
+
         Debug.Assert(eulerAngles.IsUnit());
         var (yaw, pitch, roll) = (eulerAngles.Yaw, eulerAngles.Pitch, eulerAngles.Roll);
 
@@ -101,15 +104,13 @@ public static class EulerAnglesFormulas
         var sr = Sin(halfRoll);
         var cr = Cos(halfRoll);
 
-        var sy_sp = sy * sp;
         var sy_cp = sy * cp;
-        var cy_sp = cy * sp;
         var cy_cp = cy * cp;
 
-        var x = cy_sp * cr + sy_cp * sr;
-        var y = sy_cp * cr - cy_sp * sr;
-        var z = cy_cp * sr - sy_sp * cr;
-        var w = cy_cp * cr + sy_sp * sr;
+        var x = sy_cp * sr + cy * cr * sp;
+        var y = sy_cp * cr - cy * sr * sp;
+        var z = cy_cp * sr - sy * cr * sp;
+        var w = cy_cp * cr + sy * sr * sp;
 
         return new Quaternion(x, y, z, w);
     }

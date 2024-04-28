@@ -133,15 +133,10 @@ public readonly struct DoubleEulerAngles
         var sr = Sin(halfRoll);
         var cr = Cos(halfRoll);
 
-        var sysp = sy * sp;
-        var sycp = sy * cp;
-        var cysp = cy * sp;
-        var cycp = cy * cp;
-
-        var x = cysp * cr + sycp * sr;
-        var y = sycp * cr - cysp * sr;
-        var z = cycp * sr - sysp * cr;
-        var w = cycp * cr + sysp * sr;
+        var x = cy * sp * cr + sy * cp * sr;
+        var y = sy * cp * cr - cy * sp * sr;
+        var z = cy * cp * sr - sy * sp * cr;
+        var w = cy * cp * cr + sy * sp * sr;
 
         return new DoubleQuaternion(x, y, z, w);
     }

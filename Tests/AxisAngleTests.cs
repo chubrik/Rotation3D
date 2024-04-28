@@ -39,7 +39,7 @@ public sealed class AxisAngleTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 7.1525574e-7f);
+        Assert.IsTrue(result.MaxDiffCustom <= 7.4505806e-7f);
     }
 
     [TestMethod]

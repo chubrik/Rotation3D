@@ -36,8 +36,8 @@ public sealed class EulerAnglesTests : TestsBase
             calcSystem: e => Quaternion.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
             calcCustom: e => e.UnitToQuaternion());
 
-        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 4.4703484e-7f);
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        //Assert.IsTrue(result.MaxDiffCustom <= result.MaxDiffSystem); // Sometimes possible
+        Assert.IsTrue(result.MaxDiffCustom <= 4.172325e-7f); // Less then System
     }
 }

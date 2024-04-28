@@ -58,11 +58,11 @@ public abstract class TestsBase
 
         sw = Stopwatch.StartNew();
 
-        var sumDiffSystem = 0f;
         var maxDiffSystem = 0f;
-    
-        var sumDiffCustom = 0f;
         var maxDiffCustom = 0f;
+
+        var sumDiffSystem_D = 0.0;
+        var sumDiffCustom_D = 0.0;
 
         TSrc maxDiffCustomSrc = srcSystem[0];
         TRes maxDiffCustomResDouble = calcExact(srcSystem[0]);
@@ -77,8 +77,8 @@ public abstract class TestsBase
             var diffSystem = compare(srcItem, itemDouble, resSystem[i]);
             var diffCustom = compare(srcItem, itemDouble, resCustom[i]);
 
-            sumDiffSystem += diffSystem;
-            sumDiffCustom += diffCustom;
+            sumDiffSystem_D += diffSystem;
+            sumDiffCustom_D += diffCustom;
 
             if (maxDiffSystem < diffSystem)
                 maxDiffSystem = diffSystem;
@@ -94,8 +94,8 @@ public abstract class TestsBase
             }
         }
 
-        var avgDiffSystem = sumDiffSystem / IterationCount;
-        var avgDiffCustom = sumDiffCustom / IterationCount;
+        var avgDiffSystem = (float)(sumDiffSystem_D / IterationCount);
+        var avgDiffCustom = (float)(sumDiffCustom_D / IterationCount);
 
         finalizeTime = sw.ElapsedMilliseconds;
 

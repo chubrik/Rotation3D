@@ -110,6 +110,8 @@ public static class QuaternionFormulas
 
         #endregion
 
+        // todo Tune operations order
+
         Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
@@ -184,6 +186,8 @@ public static class QuaternionFormulas
 
         #endregion
 
+        // todo Tune operations order
+
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
         var xx = x * x;
@@ -221,6 +225,8 @@ public static class QuaternionFormulas
     /// </summary>
     public static Matrix4x4 UnitToMatrix(this Quaternion quaternion)
     {
+        // Tuned operations order
+
         Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
@@ -237,17 +243,17 @@ public static class QuaternionFormulas
 
         var matrix = Matrix4x4.Identity;
 
-        matrix.M11 = 1f - (yy + zz) * 2f;
+        matrix.M11 = (0.5f - yy - zz) * 2f;
         matrix.M12 = (xy + zw) * 2f;
         matrix.M13 = (xz - yw) * 2f;
 
         matrix.M21 = (xy - zw) * 2f;
-        matrix.M22 = 1f - (xx + zz) * 2f;
+        matrix.M22 = (0.5f - xx - zz) * 2f;
         matrix.M23 = (xw + yz) * 2f;
 
         matrix.M31 = (xz + yw) * 2f;
         matrix.M32 = (yz - xw) * 2f;
-        matrix.M33 = 1f - (xx + yy) * 2f;
+        matrix.M33 = (0.5f - xx - yy) * 2f;
 
         return matrix;
     }
@@ -288,10 +294,11 @@ public static class QuaternionFormulas
         //     m12 = 2.0 * (tmp1 - tmp2)*invs ;
         // }
 
-        // Change:
-        //               [00  01  02]    [11  21  31]
-        // Flip matrix:  [10  11  12] => [12  22  32]
-        //               [20  21  22]    [13  23  33]
+        // Changes:
+        //                  [00  01  02]    [11  21  31]
+        // 1. Flip matrix:  [10  11  12] => [12  22  32]
+        //                  [20  21  22]    [13  23  33]
+        // 2. Tuned operations order
 
         #endregion
 
@@ -309,22 +316,22 @@ public static class QuaternionFormulas
         var yw = y * w;
         var zw = z * w;
 
-        var invS = 1f / (xx + yy + zz + ww);
+        var invS = 1f / (ww + xx + (yy + zz));
         var invSx2 = invS * 2f;
 
         var matrix = Matrix4x4.Identity;
 
-        matrix.M11 = (ww + xx - yy - zz) * invS;
+        matrix.M11 = (ww - yy + (xx - zz)) * invS;
         matrix.M12 = (xy + zw) * invSx2;
         matrix.M13 = (xz - yw) * invSx2;
 
         matrix.M21 = (xy - zw) * invSx2;
-        matrix.M22 = (ww - xx + yy - zz) * invS;
+        matrix.M22 = (ww - zz + (yy - xx)) * invS;
         matrix.M23 = (xw + yz) * invSx2;
 
         matrix.M31 = (xz + yw) * invSx2;
         matrix.M32 = (yz - xw) * invSx2;
-        matrix.M33 = (ww - xx - yy + zz) * invS;
+        matrix.M33 = (ww - yy + (zz - xx)) * invS;
 
         return matrix;
     }

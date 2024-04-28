@@ -79,8 +79,8 @@ public sealed class Matrix4x4Tests : TestsBase
             calcSystem: Quaternion.CreateFromRotationMatrix,
             calcCustom: m => m.UnitToQuaternion());
 
-        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 3.874302e-7f);
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 3.5762787e-7);
     }
 }

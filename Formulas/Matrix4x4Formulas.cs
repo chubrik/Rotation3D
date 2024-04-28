@@ -127,6 +127,8 @@ public static class Matrix4x4Formulas
     /// </summary>
     public static Quaternion UnitToQuaternion(this Matrix4x4 matrix)
     {
+        // Tuned operations order
+
         Debug.Assert(matrix.IsUnitAbout());
 
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
@@ -137,7 +139,7 @@ public static class Matrix4x4Formulas
 
         if (trace > 0f)
         {
-            w = Sqrt(1f + trace) * 0.5f;
+            w = Sqrt(trace + 1f) * 0.5f;
             var invS = 0.25f / w;
             x = (m23 - m32) * invS;
             y = (m31 - m13) * invS;
@@ -145,7 +147,7 @@ public static class Matrix4x4Formulas
         }
         else if (m11 >= m22 && m11 >= m33)
         {
-            x = Sqrt(1f + m11 - m22 - m33) * 0.5f;
+            x = Sqrt(m11 - m22 - m33 + 1f) * 0.5f;
             var invS = 0.25f / x;
             y = (m12 + m21) * invS;
             z = (m13 + m31) * invS;
@@ -153,7 +155,7 @@ public static class Matrix4x4Formulas
         }
         else if (m22 > m33)
         {
-            y = Sqrt(1f + m22 - m11 - m33) * 0.5f;
+            y = Sqrt(m22 - m11 - m33 + 1f) * 0.5f;
             var invS = 0.25f / y;
             x = (m21 + m12) * invS;
             z = (m32 + m23) * invS;
@@ -161,7 +163,7 @@ public static class Matrix4x4Formulas
         }
         else
         {
-            z = Sqrt(1f + m33 - m11 - m22) * 0.5f;
+            z = Sqrt(m33 - m11 - m22 + 1f) * 0.5f;
             var invS = 0.25f / z;
             x = (m31 + m13) * invS;
             y = (m32 + m23) * invS;

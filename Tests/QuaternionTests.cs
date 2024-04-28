@@ -28,7 +28,8 @@ public sealed class QuaternionTests : TestsBase
     public void UnitToEulerAngles_MainZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone().UnitToQuaternion().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
+                                          .UnitToQuaternion().RandomSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
@@ -41,7 +42,8 @@ public sealed class QuaternionTests : TestsBase
     public void UnitToEulerAngles_MiddleZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone().UnitToQuaternion().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
+                                          .UnitToQuaternion().RandomSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
@@ -54,7 +56,8 @@ public sealed class QuaternionTests : TestsBase
     public void UnitToEulerAngles_PolarZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone().UnitToQuaternion().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
+                                          .UnitToQuaternion().RandomSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
@@ -67,7 +70,8 @@ public sealed class QuaternionTests : TestsBase
     public void ScaledToEulerAngles_MainZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone().UnitToQuaternion().RandomScale().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
+                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
@@ -81,7 +85,8 @@ public sealed class QuaternionTests : TestsBase
     public void ScaledToEulerAngles_MiddleZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone().UnitToQuaternion().RandomScale().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
+                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
@@ -95,7 +100,8 @@ public sealed class QuaternionTests : TestsBase
     public void ScaledToEulerAngles_PolarZone()
     {
         var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone().UnitToQuaternion().RandomScale().ToSystem(),
+            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
+                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
             srcToString: q => q.Stringify(),
             resToString: e => e.Stringify(),
             compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
@@ -117,9 +123,9 @@ public sealed class QuaternionTests : TestsBase
             calcSystem: Matrix4x4.CreateFromQuaternion,
             calcCustom: q => q.UnitToMatrix());
 
-        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 5.8859587e-7f);
+        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
+        Assert.IsTrue(result.MaxDiffCustom <= 5.438924e-7f);
     }
 
     [TestMethod]
@@ -136,6 +142,6 @@ public sealed class QuaternionTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
         Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 1.2218952e-6f);
+        Assert.IsTrue(result.MaxDiffCustom <= 1.1026859e-6f);
     }
 }
