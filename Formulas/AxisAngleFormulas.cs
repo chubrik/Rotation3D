@@ -67,7 +67,7 @@ public static class AxisAngleFormulas
         var sinPitch = x * sa - z * y * _ca;
         float yaw, pitch, roll;
 
-        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED)
+        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED) //todo
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
             pitch = F_HALF_PI;

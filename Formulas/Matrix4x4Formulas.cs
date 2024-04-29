@@ -52,7 +52,7 @@ public static class Matrix4x4Formulas
         // 1. Flip matrix:  [10  11  12] => [-32  22 -12]
         //                  [20  21  22]    [-31 -21  11]
         //
-        // 2. 0.998 => 0.999999642 (0.05° from pole)
+        // 2. 0.998 => 0.99999994 (89.980°)
 
         #endregion
 
@@ -63,7 +63,7 @@ public static class Matrix4x4Formulas
 
         float yaw, pitch, roll;
 
-        if (m32 < -0.99999994f) // 89.980°
+        if (m32 < -0.99999994f) //todo
         {
             yaw = Atan2(-m13, m11);
             pitch = F_HALF_PI;

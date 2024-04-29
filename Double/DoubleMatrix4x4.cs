@@ -69,6 +69,22 @@ public struct DoubleMatrix4x4
         return rightDiff + upDiff + forwardDiff;
     }
 
+    public readonly double Diff(DoubleMatrix4x4 other)
+    {
+        var diff1 = Abs(M11 - other.M11);
+        var diff2 = Abs(M12 - other.M12);
+        var diff3 = Abs(M13 - other.M13);
+        var diff4 = Abs(M21 - other.M21);
+        var diff5 = Abs(M22 - other.M22);
+        var diff6 = Abs(M23 - other.M23);
+        var diff7 = Abs(M31 - other.M31);
+        var diff8 = Abs(M32 - other.M32);
+        var diff9 = Abs(M33 - other.M33);
+
+        var diffSum = diff1 + diff2 + diff3 + diff4 + diff5 + diff6 + diff7 + diff8 + diff9;
+        return diffSum;
+    }
+
     [Obsolete("Need to prove")]
     public readonly DoubleMatrix4x4 Normalize()
     {

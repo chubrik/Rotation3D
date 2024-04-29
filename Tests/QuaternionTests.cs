@@ -10,138 +10,120 @@ public sealed class QuaternionTests : TestsBase
     [TestMethod]
     public void UnitToAxisAngle_Draft()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitQuaternion,
-            srcToString: q => q.Stringify(),
-            resToString: a => a.Stringify(),
-            compare: (qSrc, aExp, aAct) => qSrc.Diff(aAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcExact: q => AxisAngle.Identity,  // No reason to convert
-            calcSystem: q => AxisAngle.Identity, // System has no solution
-            calcCustom: q => q.UnitToAxisAngle_Draft());
+        var result = Test(
+            createSrc: Randomizer.CreateUnitQuaternion,
+            compare: (src, test) => src.ToDouble().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.UnitToAxisAngle_Draft());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00079226494f);
+        Assert.IsTrue(result.MaxDiff <= 1.5067726e-6f);
     }
 
     [TestMethod]
     public void UnitToEulerAngles_MainZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
-                                          .UnitToQuaternion().RandomSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.UnitToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
+                                 .UnitToQuaternion().RandomSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 5.438924e-7f);
+        Assert.IsTrue(result.MaxDiff <= 5.044793e-7f);
     }
 
     [TestMethod]
     public void UnitToEulerAngles_MiddleZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
-                                          .UnitToQuaternion().RandomSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.UnitToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
+                                 .UnitToQuaternion().RandomSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 6.502867e-5f);
+        Assert.IsTrue(result.MaxDiff <= 6.35474e-5f);
     }
 
     [TestMethod]
     public void UnitToEulerAngles_PolarZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
-                                          .UnitToQuaternion().RandomSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.Diff(eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.UnitToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
+                                 .UnitToQuaternion().RandomSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00076410174f);
+        Assert.IsTrue(result.MaxDiff <= 0.0007375982f);
     }
 
     [TestMethod]
     public void ScaledToEulerAngles_MainZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
-                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
-                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.ScaledToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
+                                 .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Normalize().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 4.4703484e-7f);
+        Assert.IsTrue(result.MaxDiff <= 4.045536e-7f);
     }
 
     [TestMethod]
     public void ScaledToEulerAngles_MiddleZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
-                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
-                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.ScaledToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
+                                 .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Normalize().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 7.22229e-5f);
+        Assert.IsTrue(result.MaxDiff <= 7.3590425e-5f);
     }
 
     [TestMethod]
     public void ScaledToEulerAngles_PolarZone()
     {
-        var result = Prepare(
-            create: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
-                                          .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
-            srcToString: q => q.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (qSrc, eAct) => qSrc.ToDouble().Normalize().ToSystem().Diff(
-                                     eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcCustom: q => q.ScaledToEulerAngles());
+        var result = Test(
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
+                                 .UnitToQuaternion().RandomScaleAndSign().ToSystem(),
+            compare: (src, test) => src.ToDouble().Normalize().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiffCustom <= 0.0010174275f);
+        Assert.IsTrue(result.MaxDiff <= 0.0010101415f);
     }
 
     [TestMethod]
     public void UnitToMatrix()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitQuaternion,
-            srcToString: q => q.Stringify(),
-            resToString: m => m.Stringify(),
-            compare: (_, q1, q2) => q1.Diff(q2),
-            calcExact: q => q.ToDouble().UnitToMatrix().ToSystem(),
-            calcSystem: Matrix4x4.CreateFromQuaternion,
-            calcCustom: q => q.UnitToMatrix());
+        var result = TestAB(
+            createSrc: Randomizer.CreateUnitQuaternion,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: q => q.ToDouble().UnitToMatrix(),
+            calcTestA: Matrix4x4.CreateFromQuaternion,
+            calcTestB: q => q.UnitToMatrix());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 5.438924e-7f);
+        Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
+        Assert.IsTrue(result.MaxDiffB < result.MaxDiffA);
+        Assert.IsTrue(result.MaxDiffB <= 4.949115e-7f);
     }
 
     [TestMethod]
     public void ScaledToMatrix()
     {
-        var result = Prepare(
-            create: Randomizer.CreateScaledQuaternion,
-            srcToString: q => q.Stringify(),
-            resToString: m => m.Stringify(),
-            compare: (_, q1, q2) => q1.Diff(q2),
-            calcExact: q => q.ToDouble().Normalize().UnitToMatrix().ToSystem(),
-            calcSystem: q => Matrix4x4.CreateFromQuaternion(Quaternion.Normalize(q)),
-            calcCustom: q => q.ScaledToMatrix());
+        var result = TestAB(
+            createSrc: Randomizer.CreateScaledQuaternion,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: q => q.ToDouble().Normalize().UnitToMatrix(),
+            calcTestA: q => Matrix4x4.CreateFromQuaternion(Quaternion.Normalize(q)),
+            calcTestB: q => q.ScaledToMatrix());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 1.1026859e-6f);
+        Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
+        Assert.IsTrue(result.MaxDiffB < result.MaxDiffA);
+        Assert.IsTrue(result.MaxDiffB <= 1.1111016e-6f);
     }
 }

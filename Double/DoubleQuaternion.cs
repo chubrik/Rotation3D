@@ -26,6 +26,24 @@ public readonly struct DoubleQuaternion
 
     public double UnitDiff() => Abs(1.0 - Length());
 
+    public double Diff(DoubleQuaternion q2)
+    {
+        var diffX1 = Abs(X - q2.X);
+        var diffY1 = Abs(Y - q2.Y);
+        var diffZ1 = Abs(Z - q2.Z);
+        var diffW1 = Abs(W - q2.W);
+
+        var diffX2 = Abs(X + q2.X);
+        var diffY2 = Abs(Y + q2.Y);
+        var diffZ2 = Abs(Z + q2.Z);
+        var diffW2 = Abs(W + q2.W);
+
+        var diffSum1 = diffX1 + diffY1 + diffZ1 + diffW1;
+        var diffSum2 = diffX2 + diffY2 + diffZ2 + diffW2;
+        var diffSum = Min(diffSum1, diffSum2);
+        return diffSum;
+    }
+
     /// <summary>
     /// ✔ Proved by Microsoft: <see cref="Quaternion.Normalize(Quaternion)"/>
     /// </summary>

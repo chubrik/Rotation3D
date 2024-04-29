@@ -10,52 +10,42 @@ public sealed class AxisAngleTests : TestsBase
     [TestMethod]
     public void UnitToEulerAngles()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitAxisAngle,
-            srcToString: a => a.Stringify(),
-            resToString: e => e.Stringify(),
-            compare: (aSrc, eExp, eAct) => aSrc.ToDouble().UnitToQuaternion().ToSystem().Diff(
-                                           eAct.ToDouble().UnitToQuaternion().ToSystem()),
-            calcExact: a => EulerAngles.Identity,  // No reason to convert
-            calcSystem: a => EulerAngles.Identity, // System has no solution
-            calcCustom: a => a.UnitToEulerAngles());
+        var result = Test(
+            createSrc: Randomizer.CreateUnitAxisAngle,
+            compare: (src, test) => src.ToDouble().UnitToQuaternion().Diff(
+                                    test.ToDouble().UnitToQuaternion()),
+            calcTest: a => a.UnitToEulerAngles());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 0.00086560845f);
+        Assert.IsTrue(result.MaxDiff <= 0.0008656186f);
     }
 
     [TestMethod]
     public void UnitToMatrix()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitAxisAngle,
-            srcToString: a => a.Stringify(),
-            resToString: m => m.Stringify(),
-            compare: (_, m1, m2) => m1.Diff(m2),
-            calcExact: a => a.ToDouble().UnitToMatrix().ToSystem(),
-            calcSystem: a => Matrix4x4.CreateFromAxisAngle(a.Axis, a.Angle),
-            calcCustom: a => a.UnitToMatrix());
+        var result = TestAB(
+            createSrc: Randomizer.CreateUnitAxisAngle,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: a => a.ToDouble().UnitToMatrix(),
+            calcTestA: a => Matrix4x4.CreateFromAxisAngle(a.Axis, a.Angle),
+            calcTestB: a => a.UnitToMatrix());
 
-        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 7.4505806e-7f);
+        Assert.IsTrue(result.AvgDiffB == result.AvgDiffA);
+        Assert.IsTrue(result.MaxDiffB == result.MaxDiffA);
+        Assert.IsTrue(result.MaxDiffB <= 6.5696815e-7f);
     }
 
     [TestMethod]
     public void UnitToQuaternion()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitAxisAngle,
-            srcToString: a => a.Stringify(),
-            resToString: m => m.Stringify(),
-            compare: (_, m1, m2) => m1.Diff(m2),
-            calcExact: a => a.ToDouble().UnitToQuaternion().ToSystem(),
-            calcSystem: a => Quaternion.CreateFromAxisAngle(a.Axis, a.Angle),
-            calcCustom: a => a.UnitToQuaternion());
+        var result = TestAB(
+            createSrc: Randomizer.CreateUnitAxisAngle,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: a => a.ToDouble().UnitToQuaternion(),
+            calcTestA: a => Quaternion.CreateFromAxisAngle(a.Axis, a.Angle),
+            calcTestB: a => a.UnitToQuaternion());
 
-        Assert.IsTrue(result.AvgDiffCustom == result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom == result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 2.0861626e-7f);
+        Assert.IsTrue(result.AvgDiffB == result.AvgDiffA);
+        Assert.IsTrue(result.MaxDiffB == result.MaxDiffA);
+        Assert.IsTrue(result.MaxDiffB <= 1.5170345e-7f);
     }
 }

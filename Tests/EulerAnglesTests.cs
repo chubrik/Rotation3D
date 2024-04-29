@@ -10,34 +10,30 @@ public sealed class EulerAnglesTests : TestsBase
     [TestMethod]
     public void UnitToMatrix()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitEulerAngles,
-            srcToString: e => e.Stringify(),
-            resToString: m => m.Stringify(),
-            compare: (_, m1, m2) => m1.Diff(m2),
-            calcExact: e => e.ToDouble().UnitToMatrix().ToSystem(),
-            calcSystem: e => Matrix4x4.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
-            calcCustom: e => e.UnitToMatrix());
+        var result = TestAB(
+            createSrc: Randomizer.CreateUnitEulerAngles,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: e => e.ToDouble().UnitToMatrix(),
+            calcTestA: e => Matrix4x4.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
+            calcTestB: e => e.UnitToMatrix());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom < result.MaxDiffSystem);
-        Assert.IsTrue(result.MaxDiffCustom <= 6.3329935e-7f);
+        Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
+        Assert.IsTrue(result.MaxDiffB < result.MaxDiffA);
+        Assert.IsTrue(result.MaxDiffB <= 5.614007e-7f);
     }
 
     [TestMethod]
     public void UnitToQuaternion()
     {
-        var result = Prepare(
-            create: Randomizer.CreateUnitEulerAngles,
-            srcToString: e => e.Stringify(),
-            resToString: q => q.Stringify(),
-            compare: (_, q1, q2) => q1.Diff(q2),
-            calcExact: e => e.ToDouble().UnitToQuaternion().ToSystem(),
-            calcSystem: e => Quaternion.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
-            calcCustom: e => e.UnitToQuaternion());
+        var result = TestAB(
+            createSrc: Randomizer.CreateUnitEulerAngles,
+            compare: (exact, test) => exact.Diff(test.ToDouble()),
+            calcExact: e => e.ToDouble().UnitToQuaternion(),
+            calcTestA: e => Quaternion.CreateFromYawPitchRoll(e.Yaw, e.Pitch, e.Roll),
+            calcTestB: e => e.UnitToQuaternion());
 
-        Assert.IsTrue(result.AvgDiffCustom < result.AvgDiffSystem);
-        //Assert.IsTrue(result.MaxDiffCustom <= result.MaxDiffSystem); // Sometimes possible
-        Assert.IsTrue(result.MaxDiffCustom <= 4.172325e-7f); // Less then System
+        Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
+        //Assert.IsTrue(result.MaxDiffB <= result.MaxDiffA); // Sometimes possible
+        Assert.IsTrue(result.MaxDiffB <= 3.8816358e-7f);
     }
 }

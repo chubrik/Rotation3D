@@ -105,7 +105,7 @@ public static class QuaternionFormulas
 
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
-        // 2. 0.499 => 0.499999821 (0.05° from pole)
+        // 2. 0.499 => 0.4999999 (89.966°)
         // 3. Fix yaw in poles: Atan2(-m13, m11)
 
         #endregion
@@ -118,7 +118,7 @@ public static class QuaternionFormulas
         var halfSinPitch = x * w - y * z;
         float yaw, pitch, roll;
 
-        if (halfSinPitch > 0.4999999f) // 89.966°
+        if (halfSinPitch > 0.4999999f) //todo
         {
             yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
             pitch = F_HALF_PI;
@@ -181,7 +181,7 @@ public static class QuaternionFormulas
 
         // Changes:
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
-        // 2. 0.499 => 0.499999821 (0.05° from pole)
+        // 2. 0.499 => 0.499999851 (89.956°)
         // 3. Fix yaw in poles: Atan2(-m13, m11)
 
         #endregion
@@ -198,7 +198,7 @@ public static class QuaternionFormulas
         var halfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
         float yaw, pitch, roll;
 
-        if (halfSinPitch > 0.499999851f) // 89.956°
+        if (halfSinPitch > 0.499999851f) //todo
         {
             yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
             pitch = F_HALF_PI;
@@ -321,7 +321,7 @@ public static class QuaternionFormulas
 
         var matrix = Matrix4x4.Identity;
 
-        matrix.M11 = (ww - yy + (xx - zz)) * invS;
+        matrix.M11 = (ww - zz + (xx - yy)) * invS;
         matrix.M12 = (xy + zw) * invSx2;
         matrix.M13 = (xz - yw) * invSx2;
 

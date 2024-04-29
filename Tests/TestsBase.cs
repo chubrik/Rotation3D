@@ -3,6 +3,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rotation3D.Double;
 using System.Diagnostics;
+using System.Numerics;
 
 public abstract class TestsBase
 {
@@ -19,200 +20,238 @@ public abstract class TestsBase
             DoubleConstants.SelfCheck();
             Constants.SelfCheck();
         }
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
     }
 
-    protected static Result<TSrc, TRes> Prepare<TSrc, TRes>(
-        Func<TSrc> create,
-        Func<TSrc, string> srcToString,
-        Func<TRes, string> resToString,
-        Func<TSrc, TRes, TRes, float> compare,
-        Func<TSrc, TRes> calcExact,
-        Func<TSrc, TRes> calcSystem,
-        Func<TSrc, TRes> calcCustom)
-    {
-        var sw = Stopwatch.StartNew();
-
-        long initializeTime;
-        long calcSystemTime;
-        long calcCustomTime;
-        long finalizeTime;
-        var srcSystem = new TSrc[IterationCount];
-        var resSystem = new TRes[IterationCount];
-        var resCustom = new TRes[IterationCount];
-        TSrc srcItem;
-
-        for (int i = 0; i < IterationCount; i++)
-            srcSystem[i] = create();
-
-        initializeTime = sw.ElapsedMilliseconds;
-
-        sw = Stopwatch.StartNew();
-        for (int i = 0; i < IterationCount; i++)
-            resSystem[i] = calcSystem(srcSystem[i]);
-        calcSystemTime = sw.ElapsedMilliseconds;
-
-        sw = Stopwatch.StartNew();
-        for (int i = 0; i < IterationCount; i++)
-            resCustom[i] = calcCustom(srcSystem[i]);
-        calcCustomTime = sw.ElapsedMilliseconds;
-
-        sw = Stopwatch.StartNew();
-
-        var maxDiffSystem = 0f;
-        var maxDiffCustom = 0f;
-
-        var sumDiffSystem_D = 0.0;
-        var sumDiffCustom_D = 0.0;
-
-        TSrc maxDiffCustomSrc = srcSystem[0];
-        TRes maxDiffCustomResDouble = calcExact(srcSystem[0]);
-        TRes maxDiffCustomResSystem = resSystem[0];
-        TRes maxDiffCustomRes = resCustom[0];
-        var maxDiffCustomSystem = 0f;
-
-        for (int i = 0; i < IterationCount; i++)
-        {
-            srcItem = srcSystem[i];
-            var itemDouble = calcExact(srcItem);
-            var diffSystem = compare(srcItem, itemDouble, resSystem[i]);
-            var diffCustom = compare(srcItem, itemDouble, resCustom[i]);
-
-            sumDiffSystem_D += diffSystem;
-            sumDiffCustom_D += diffCustom;
-
-            if (maxDiffSystem < diffSystem)
-                maxDiffSystem = diffSystem;
-
-            if (maxDiffCustom < diffCustom)
-            {
-                maxDiffCustom = diffCustom;
-                maxDiffCustomSrc = srcSystem[i];
-                maxDiffCustomResDouble = itemDouble;
-                maxDiffCustomResSystem = resSystem[i];
-                maxDiffCustomRes = resCustom[i];
-                maxDiffCustomSystem = diffSystem;
-            }
-        }
-
-        var avgDiffSystem = (float)(sumDiffSystem_D / IterationCount);
-        var avgDiffCustom = (float)(sumDiffCustom_D / IterationCount);
-
-        finalizeTime = sw.ElapsedMilliseconds;
-
-        var calculationTime = calcSystemTime + calcCustomTime;
-        Console.WriteLine($"Calculation: {calculationTime,4} ms    Iterations:  {IterationCount:N}");
-        Console.WriteLine($"Calc system: {calcSystemTime,4} ms    Initialize:  {initializeTime,4} ms");
-        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Finalize:    {finalizeTime,4} ms");
-        Console.WriteLine();
-
-        Console.WriteLine($"System diff:  max: {maxDiffSystem.Stringify(","),-13}  avg: {avgDiffSystem.Stringify()}");
-        Console.WriteLine($"Custom diff:  max: {maxDiffCustom.Stringify(","),-13}  avg: {avgDiffCustom.Stringify()}");
-        Console.WriteLine();
-
-        Console.WriteLine("== Worst for custom ==");
-        Console.WriteLine($"Source:  {"",12}   {srcToString(maxDiffCustomSrc)}");
-        Console.WriteLine($"Double:  {0,-12}   {resToString(maxDiffCustomResDouble)}");
-        Console.WriteLine($"System:  {maxDiffCustomSystem.Stringify()}   {resToString(maxDiffCustomResSystem)}");
-        Console.WriteLine($"Custom:  {maxDiffCustom.Stringify()}   {resToString(maxDiffCustomRes)}");
-
-        return new Result<TSrc, TRes>(
-            avgDiffSystem: avgDiffSystem,
-            maxDiffSystem: maxDiffSystem,
-            avgDiffCustom: avgDiffCustom,
-            maxDiffCustom: maxDiffCustom
-        );
-    }
-
-    protected static Result<TSrc, TRes> Prepare<TSrc, TRes>(
-        Func<TSrc> create,
-        Func<TSrc, string> srcToString,
-        Func<TRes, string> resToString,
-        Func<TSrc, TRes, float> compare,
-        Func<TSrc, TRes> calcCustom)
+    protected static Result<TSrc, TTest> Test<TSrc, TTest>(
+        Func<TSrc> createSrc,
+        Func<TSrc, TTest, double> compare,
+        Func<TSrc, TTest> calcTest)
     {
         var sw = Stopwatch.StartNew();
 
         long initializeTime;
         long calcCustomTime;
         long finalizeTime;
-        var srcSystem = new TSrc[IterationCount];
-        var resCustom = new TRes[IterationCount];
-        TSrc srcItem;
+        var listSrc = new TSrc[IterationCount];
+        var listTest = new TTest[IterationCount];
 
         for (int i = 0; i < IterationCount; i++)
-            srcSystem[i] = create();
+            listSrc[i] = createSrc();
 
         initializeTime = sw.ElapsedMilliseconds;
 
         sw = Stopwatch.StartNew();
         for (int i = 0; i < IterationCount; i++)
-            resCustom[i] = calcCustom(srcSystem[i]);
+            listTest[i] = calcTest(listSrc[i]);
         calcCustomTime = sw.ElapsedMilliseconds;
 
         sw = Stopwatch.StartNew();
 
-        var sumDiffCustom = 0f;
-        var maxDiffCustom = 0f;
+        var sumDiff_D = 0.0;
+        var maxDiff_D = 0.0;
 
-        TSrc maxDiffCustomSrc = srcSystem[0];
-        TRes maxDiffCustomRes = resCustom[0];
+        TSrc maxDiffSrc = listSrc[0];
+        TTest maxDiffRes = listTest[0];
 
         for (int i = 0; i < IterationCount; i++)
         {
-            srcItem = srcSystem[i];
-            var diffCustom = compare(srcItem, resCustom[i]);
+            var srcItem = listSrc[i];
+            var diff_D = compare(srcItem, listTest[i]);
 
-            sumDiffCustom += diffCustom;
+            sumDiff_D += diff_D;
 
-            if (maxDiffCustom < diffCustom)
+            if (maxDiff_D < diff_D)
             {
-                maxDiffCustom = diffCustom;
-                maxDiffCustomSrc = srcSystem[i];
-                maxDiffCustomRes = resCustom[i];
+                maxDiff_D = diff_D;
+                maxDiffSrc = listSrc[i];
+                maxDiffRes = listTest[i];
             }
         }
 
-        var avgDiffCustom = sumDiffCustom / IterationCount;
+        var avgDiffCustom = (float)(sumDiff_D / IterationCount);
 
         finalizeTime = sw.ElapsedMilliseconds;
 
-        Console.WriteLine($"                        Iterations:  {IterationCount:N}");
-        Console.WriteLine($"                        Initialize:  {initializeTime,4} ms");
-        Console.WriteLine($"Calc custom: {calcCustomTime,4} ms    Finalize:    {finalizeTime,4} ms");
+        Console.WriteLine($"                 Iterations:  {IterationCount:N}");
+        Console.WriteLine($"                 Initialize:  {initializeTime,4} ms");
+        Console.WriteLine($"Calc: {calcCustomTime,4} ms    Finalize:    {finalizeTime,4} ms");
         Console.WriteLine();
 
-        Console.WriteLine($"Custom diff:  max: {maxDiffCustom.Stringify(","),-13}  avg: {avgDiffCustom.Stringify()}");
+        Console.WriteLine($"Diff:  max: {((float)maxDiff_D).Stringify(","),-13}  avg: {avgDiffCustom.Stringify()}");
         Console.WriteLine();
 
-        Console.WriteLine("== Worst for custom ==");
-        Console.WriteLine($"Source:  {"",12}   {srcToString(maxDiffCustomSrc)}");
-        Console.WriteLine($"Custom:  {maxDiffCustom.Stringify()}   {resToString(maxDiffCustomRes)}");
+        Console.WriteLine("== Worst for test ==");
+        Console.WriteLine($"Source:  {"",12}   {Stringify(maxDiffSrc)}");
+        Console.WriteLine($"Test:    {((float)maxDiff_D).Stringify()}   {Stringify(maxDiffRes)}");
 
-        return new Result<TSrc, TRes>(
-            avgDiffSystem: float.NaN,
-            maxDiffSystem: float.NaN,
-            avgDiffCustom: avgDiffCustom,
-            maxDiffCustom: maxDiffCustom
+        return new Result<TSrc, TTest>(
+            avgDiff: avgDiffCustom,
+            maxDiff: (float)maxDiff_D
         );
+    }
+
+    protected static ResultAB<TSrc, TTest> TestAB<TSrc, TTest, TExact>(
+        Func<TSrc> createSrc,
+        Func<TExact, TTest, double> compare,
+        Func<TSrc, TExact> calcExact,
+        Func<TSrc, TTest> calcTestA,
+        Func<TSrc, TTest> calcTestB)
+    {
+        var sw = Stopwatch.StartNew();
+
+        long initializeTime;
+        long calcATime;
+        long calcBTime;
+        long finalizeTime;
+        var listSrc = new TSrc[IterationCount];
+        var listTestA = new TTest[IterationCount];
+        var listTestB = new TTest[IterationCount];
+
+        for (int i = 0; i < IterationCount; i++)
+            listSrc[i] = createSrc();
+
+        initializeTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            listTestA[i] = calcTestA(listSrc[i]);
+        calcATime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+        for (int i = 0; i < IterationCount; i++)
+            listTestB[i] = calcTestB(listSrc[i]);
+        calcBTime = sw.ElapsedMilliseconds;
+
+        sw = Stopwatch.StartNew();
+
+        var maxDiffA_D = 0.0;
+        var maxDiffB_D = 0.0;
+
+        var sumDiffA_D = 0.0;
+        var sumDiffB_D = 0.0;
+
+        TSrc maxDiffBSrc = listSrc[0];
+        TExact maxDiffBResExact = calcExact(listSrc[0]);
+        TTest maxDiffBResA = listTestA[0];
+        TTest maxDiffBRes = listTestB[0];
+        var maxDiffBResAValue_D = 0.0;
+
+        for (int i = 0; i < IterationCount; i++)
+        {
+            var srcItem = listSrc[i];
+            var itemExact = calcExact(srcItem);
+            var diffA_D = compare(itemExact, listTestA[i]);
+            var diffB_D = compare(itemExact, listTestB[i]);
+
+            sumDiffA_D += diffA_D;
+            sumDiffB_D += diffB_D;
+
+            if (maxDiffA_D < diffA_D)
+                maxDiffA_D = diffA_D;
+
+            if (maxDiffB_D < diffB_D)
+            {
+                maxDiffB_D = diffB_D;
+                maxDiffBSrc = listSrc[i];
+                maxDiffBResExact = itemExact;
+                maxDiffBResA = listTestA[i];
+                maxDiffBRes = listTestB[i];
+                maxDiffBResAValue_D = diffA_D;
+            }
+        }
+
+        var avgDiffA = (float)(sumDiffA_D / IterationCount);
+        var avgDiffB = (float)(sumDiffB_D / IterationCount);
+
+        finalizeTime = sw.ElapsedMilliseconds;
+
+        var calculationTime = calcATime + calcBTime;
+        Console.WriteLine($"Calc:    {calculationTime,4} ms    Iterations:  {IterationCount:N}");
+        Console.WriteLine($"Calc A:  {calcATime,4} ms    Initialize:  {initializeTime,4} ms");
+        Console.WriteLine($"Calc B:  {calcBTime,4} ms    Finalize:    {finalizeTime,4} ms");
+        Console.WriteLine();
+
+        Console.WriteLine($"Diff A:  max: {((float)maxDiffA_D).Stringify(","),-13}  avg: {avgDiffA.Stringify()}");
+        Console.WriteLine($"Diff B:  max: {((float)maxDiffB_D).Stringify(","),-13}  avg: {avgDiffB.Stringify()}");
+        Console.WriteLine();
+
+        Console.WriteLine("== Worst for test B ==");
+        Console.WriteLine($"Source:  {"",12}   {Stringify(maxDiffBSrc)}");
+        Console.WriteLine($"Exact:   {0,-12}   {Stringify(maxDiffBResExact)}");
+        Console.WriteLine($"Test A:  {((float)maxDiffBResAValue_D).Stringify()}   {Stringify(maxDiffBResA)}");
+        Console.WriteLine($"Test B:  {((float)maxDiffB_D).Stringify()}   {Stringify(maxDiffBRes)}");
+
+        return new ResultAB<TSrc, TTest>(
+            avgDiffA: avgDiffA,
+            maxDiffA: (float)maxDiffA_D,
+            avgDiffB: avgDiffB,
+            maxDiffB: (float)maxDiffB_D
+        );
+    }
+
+    private static string Stringify(object? obj)
+    {
+        if (obj is AxisAngle axisAngle)
+            return axisAngle.Stringify();
+
+        if (obj is EulerAngles eulerAngles)
+            return eulerAngles.Stringify();
+
+        if (obj is Matrix4x4 matrix)
+            return matrix.Stringify();
+
+        if (obj is Quaternion quaternion)
+            return quaternion.Stringify();
+
+        if (obj is DoubleAxisAngle doubleAxisAngle)
+            return doubleAxisAngle.ToSystem().Stringify();
+
+        if (obj is DoubleEulerAngles doubleEulerAngles)
+            return doubleEulerAngles.ToSystem().Stringify();
+
+        if (obj is DoubleMatrix4x4 doubleMatrix)
+            return doubleMatrix.ToSystem().Stringify();
+
+        if (obj is DoubleQuaternion doubleQuaternion)
+            return doubleQuaternion.ToSystem().Stringify();
+
+        throw new InvalidOperationException();
     }
 
     protected sealed class Result<TSrc, TRes>
     {
-        public float AvgDiffSystem { get; }
-        public float MaxDiffSystem { get; }
-        public float AvgDiffCustom { get; }
-        public float MaxDiffCustom { get; }
+        public float AvgDiff { get; }
+        public float MaxDiff { get; }
 
         public Result(
-            float avgDiffSystem,
-            float maxDiffSystem,
-            float avgDiffCustom,
-            float maxDiffCustom)
+            float avgDiff,
+            float maxDiff)
         {
-            AvgDiffSystem = avgDiffSystem;
-            MaxDiffSystem = maxDiffSystem;
-            AvgDiffCustom = avgDiffCustom;
-            MaxDiffCustom = maxDiffCustom;
+            AvgDiff = avgDiff;
+            MaxDiff = maxDiff;
+        }
+    }
+
+    protected sealed class ResultAB<TSrc, TRes>
+    {
+        public float AvgDiffA { get; }
+        public float MaxDiffA { get; }
+        public float AvgDiffB { get; }
+        public float MaxDiffB { get; }
+
+        public ResultAB(
+            float avgDiffA,
+            float maxDiffA,
+            float avgDiffB,
+            float maxDiffB)
+        {
+            AvgDiffA = avgDiffA;
+            MaxDiffA = maxDiffA;
+            AvgDiffB = avgDiffB;
+            MaxDiffB = maxDiffB;
         }
     }
 }
