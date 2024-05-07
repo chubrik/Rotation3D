@@ -26,17 +26,17 @@ public readonly struct DoubleQuaternion
 
     public double UnitDiff() => Abs(1.0 - Length());
 
-    public double Diff(DoubleQuaternion q2)
+    public double Diff(DoubleQuaternion other)
     {
-        var diffX1 = Abs(X - q2.X);
-        var diffY1 = Abs(Y - q2.Y);
-        var diffZ1 = Abs(Z - q2.Z);
-        var diffW1 = Abs(W - q2.W);
+        var diffX1 = Abs(X - other.X);
+        var diffY1 = Abs(Y - other.Y);
+        var diffZ1 = Abs(Z - other.Z);
+        var diffW1 = Abs(W - other.W);
 
-        var diffX2 = Abs(X + q2.X);
-        var diffY2 = Abs(Y + q2.Y);
-        var diffZ2 = Abs(Z + q2.Z);
-        var diffW2 = Abs(W + q2.W);
+        var diffX2 = Abs(X + other.X);
+        var diffY2 = Abs(Y + other.Y);
+        var diffZ2 = Abs(Z + other.Z);
+        var diffW2 = Abs(W + other.W);
 
         var diffSum1 = diffX1 + diffY1 + diffZ1 + diffW1;
         var diffSum2 = diffX2 + diffY2 + diffZ2 + diffW2;
@@ -51,20 +51,6 @@ public readonly struct DoubleQuaternion
     {
         var invLen = 1.0 / Sqrt(X * X + Y * Y + Z * Z + W * W);
         return new DoubleQuaternion(X * invLen, Y * invLen, Z * invLen, W * invLen);
-    }
-
-    [Obsolete("Need to prove")]
-    public DoubleAxisAngle UnitToAxisAngle()
-    {
-        //todo assert unit
-        throw new NotImplementedException();
-    }
-
-    [Obsolete("Need to prove")]
-    public DoubleEulerAngles UnitToEulerAngles()
-    {
-        //todo assert unit
-        throw new NotImplementedException();
     }
 
     /// <summary>

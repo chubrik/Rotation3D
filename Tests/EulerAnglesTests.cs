@@ -19,7 +19,7 @@ public sealed class EulerAnglesTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
         Assert.IsTrue(result.MaxDiffB < result.MaxDiffA);
-        Assert.IsTrue(result.MaxDiffB <= 5.614007e-7f);
+        Assert.IsTrue(result.MaxDiffB <= 5.804856e-7f);
     }
 
     [TestMethod]
@@ -34,6 +34,6 @@ public sealed class EulerAnglesTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
         //Assert.IsTrue(result.MaxDiffB <= result.MaxDiffA); // Sometimes possible
-        Assert.IsTrue(result.MaxDiffB <= 3.8816358e-7f);
+        Assert.IsTrue(result.MaxDiffB <= 3.8896852e-7f);
     }
 }

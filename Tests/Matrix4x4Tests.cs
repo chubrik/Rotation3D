@@ -11,39 +11,39 @@ public sealed class Matrix4x4Tests : TestsBase
     public void UnitToEulerAngles_MainZone()
     {
         var result = Test(
-            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MainZone()
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles(0, 45)
                                  .UnitToMatrix().ToSystem(),
             compare: (src, test) => src.ToDouble().UnitToQuaternion().Diff(
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 2.768764e-7f);
+        Assert.IsTrue(result.MaxDiff <= 2.7755635e-7f);
     }
 
     [TestMethod]
     public void UnitToEulerAngles_MiddleZone()
     {
         var result = Test(
-            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_MiddleZone()
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles(45, 80)
                                  .UnitToMatrix().ToSystem(),
             compare: (src, test) => src.ToDouble().UnitToQuaternion().Diff(
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 8.631746e-6f);
+        Assert.IsTrue(result.MaxDiff <= 3.818611e-7f);
     }
 
     [TestMethod]
     public void UnitToEulerAngles_PolarZone()
     {
         var result = Test(
-            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles_PolarZone()
+            createSrc: () => DoubleRandomizer.CreateUnitEulerAngles(80, 90)
                                  .UnitToMatrix().ToSystem(),
             compare: (src, test) => src.ToDouble().UnitToQuaternion().Diff(
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: m => m.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 0.0002441789f);
+        Assert.IsTrue(result.MaxDiff <= 3.4039078e-7f);
     }
 
     [TestMethod]

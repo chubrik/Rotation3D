@@ -12,9 +12,6 @@ public static class Constants
     public const float F_DEG_TO_RAD = (float)DoubleConstants.DEG_TO_RAD; // < double
     public const float F_RAD_TO_DEG = (float)DoubleConstants.RAD_TO_DEG; // > double
 
-    [Obsolete]
-    public const float F_SIN_NEAR_90_UNAPPROVED = 0.999999642f; // > double
-
     public const float MatrixUnitMaxDiff = 5.645605E-7f;
     public const float QuaternionUnitMaxDiff = 2.0706733E-7f;
     public const float Vector3UnitMaxDiff = 1.7881393E-7f;

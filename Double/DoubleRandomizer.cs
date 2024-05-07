@@ -15,6 +15,18 @@ public static class DoubleRandomizer
         return axisAngle;
     }
 
+    public static DoubleAxisAngle CreateUnitAxisAngle(double minAngleDeg, double maxAngleDeg)
+    {
+        var angleDiffDeg = maxAngleDeg - minAngleDeg;
+        var rawAngleDeg = _random.NextDouble() * angleDiffDeg * 2 - angleDiffDeg;
+        var angleDeg = rawAngleDeg > 0 ? rawAngleDeg + minAngleDeg : rawAngleDeg - minAngleDeg;
+        var angle = angleDeg * DEG_TO_RAD;
+
+        var axis = CreateUnitVector3();
+        var axisAngle = new DoubleAxisAngle(axis, angle);
+        return axisAngle;
+    }
+
     public static DoubleAxisAngle CreateScaledAxisAngle()
     {
         var axis = CreateScaledVector3();
@@ -32,38 +44,14 @@ public static class DoubleRandomizer
         return eulerAngles;
     }
 
-    /// <summary>Pitch ±0...45°</summary>
-    public static DoubleEulerAngles CreateUnitEulerAngles_MainZone()
+    public static DoubleEulerAngles CreateUnitEulerAngles(double minPitchDeg, double maxPitchDeg)
     {
-        var yaw = CreateUnitAngle();
-        var pitch = CreateUnitAngle() / 4.0; // ±0...45°
-        var roll = CreateUnitAngle();
-        var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
-        return eulerAngles;
-    }
+        var pitchDiffDeg = maxPitchDeg - minPitchDeg;
+        var rawPitchDeg = _random.NextDouble() * pitchDiffDeg * 2 - pitchDiffDeg;
 
-    /// <summary>Pitch ±45...89.8°</summary>
-    public static DoubleEulerAngles CreateUnitEulerAngles_MiddleZone()
-    {
-        const double pitchRandomFactor = 44.8;
-        var rawPitchDeg = _random.NextDouble() * pitchRandomFactor * 2 - pitchRandomFactor; // ±44.8°
-        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + 45 : rawPitchDeg - 45; // ±45...89.8°
-        var pitch = pitchDeg * DEG_TO_RAD;
-
-        var yaw = CreateUnitAngle();
-        var roll = CreateUnitAngle();
-        var eulerAngles = new DoubleEulerAngles(yaw, pitch, roll);
-        return eulerAngles;
-    }
-
-    /// <summary>Pitch ±89.8...90°</summary>
-    public static DoubleEulerAngles CreateUnitEulerAngles_PolarZone()
-    {
-        const double polarPitchHeightDegForTest = 0.2;
-        const double pitchShift = 90 - polarPitchHeightDegForTest;
-        var rawPitchDeg = _random.NextDouble() * polarPitchHeightDegForTest * 2 - polarPitchHeightDegForTest; // ±0.2°
-        var pitchDeg = rawPitchDeg >= 0 ? rawPitchDeg + pitchShift : rawPitchDeg - pitchShift; // ±89.8...90°
-        var pitch = pitchDeg * DEG_TO_RAD;
+        var pitch = rawPitchDeg > 0
+            ? Min((rawPitchDeg + minPitchDeg) * DEG_TO_RAD, Constants.F_HALF_PI)
+            : Max((rawPitchDeg - minPitchDeg) * DEG_TO_RAD, -Constants.F_HALF_PI);
 
         var yaw = CreateUnitAngle();
         var roll = CreateUnitAngle();
@@ -85,7 +73,7 @@ public static class DoubleRandomizer
         return scaledMatrix;
     }
 
-    public static DoubleMatrix4x4 RandomScale(this DoubleMatrix4x4 matrix)
+    private static DoubleMatrix4x4 RandomScale(this DoubleMatrix4x4 matrix)
     {
         var scaleX = CreateFactor();
         var scaleY = CreateFactor();
@@ -107,7 +95,7 @@ public static class DoubleRandomizer
         var x = CreateUnitValue();
         var y = CreateUnitValue();
         var z = CreateUnitValue();
-        var w = CreateUnitValue();
+        var w = Sin(CreateUnitValue());
         var quaternion = new DoubleQuaternion(x, y, z, w);
         var unitQuaternion = quaternion.Normalize();
         return unitQuaternion;
@@ -119,9 +107,15 @@ public static class DoubleRandomizer
         var x = CreateUnitValue() * scale;
         var y = CreateUnitValue() * scale;
         var z = CreateUnitValue() * scale;
-        var w = CreateUnitValue() * scale;
+        var w = Sin(CreateUnitValue()) * scale;
         var quaternion = new DoubleQuaternion(x, y, z, w);
         return quaternion;
+    }
+
+    public static DoubleQuaternion RandomSign(this DoubleQuaternion quaternion)
+    {
+        var sign = _random.NextSingle();
+        return sign < 0.5f ? quaternion : quaternion.Negate();
     }
 
     public static DoubleQuaternion RandomScaleAndSign(this DoubleQuaternion quaternion)
@@ -137,12 +131,6 @@ public static class DoubleRandomizer
             return new DoubleQuaternion(x, y, z, w);
         else
             return new DoubleQuaternion(-x, -y, -z, -w);
-    }
-
-    public static DoubleQuaternion RandomSign(this DoubleQuaternion quaternion)
-    {
-        var sign = _random.NextSingle();
-        return sign < 0.5f ? quaternion : quaternion.Negate();
     }
 
     private static DoubleVector3 CreateUnitVector3()

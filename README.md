@@ -9,10 +9,10 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 
 | | To AxisAngle | To EulerAngles | To Matrix4x4 | To Quaternion |
 | :-- | :-- | :-- | :-- | :-- |
-| **AxisAngle** | &nbsp;– | ⏳ Testing | ✅ Proved | ✅ Proved |
+| **AxisAngle** | &nbsp;– | ⏳ Updating | ✅ Proved | ✅ Proved |
 | **EulerAngles** | ❌ Not yet | &nbsp;– | ✅ Proved | ✅ Proved |
 | **Matrix4x4** | ❌ Not yet | ✅ Proved | &nbsp;– | ✅ Proved |
-| **Quaternion** | ⚠️ Draft | ✅ Proved | ✅ Proved | &nbsp;– |
+| **Quaternion** | ✅ Proved | ⏳ Updating | ✅ Proved | &nbsp;– |
 
 <br>
 
@@ -23,4 +23,4 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 | **AxisAngle** | &nbsp;– | ❌ Not yet | ❌ Not yet | ❌ Not yet |
 | **EulerAngles** | ❌ Not yet | &nbsp;– | ❌ Not yet | ❌ Not yet |
 | **Matrix4x4** | ❌ Not yet | ⚠️ Draft | &nbsp;– | ❌ Not yet |
-| **Quaternion** | ❌ Not yet | ✅ Proved | ✅ Proved | &nbsp;– |
+| **Quaternion** | ❌ Not yet | ⏳ Small src ? | ⏳ Small src ? | &nbsp;– |

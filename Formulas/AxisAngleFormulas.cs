@@ -15,7 +15,7 @@ public static class AxisAngleFormulas
         return new AxisAngle(axis, angle);
     }
 
-    [Obsolete("Need to prove")]
+    [Obsolete("Need to upgrade")]
     public static EulerAngles UnitToEulerAngles(this AxisAngle axisAngle)
     {
         #region Explanations
@@ -67,13 +67,13 @@ public static class AxisAngleFormulas
         var sinPitch = x * sa - z * y * _ca;
         float yaw, pitch, roll;
 
-        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED) //todo
+        if (sinPitch > 0.999999642f) //todo
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < -F_SIN_NEAR_90_UNAPPROVED)
+        else if (sinPitch < -0.999999642f)
         {
             yaw = Atan2(y * sa - x * z * _ca, xx + (1f - xx) * (1f - _ca));
             pitch = -F_HALF_PI;
@@ -101,6 +101,7 @@ public static class AxisAngleFormulas
 
         var sa = Sin(angle);
         var ca = Cos(angle);
+
         var xx = x * x;
         var yy = y * y;
         var zz = z * z;

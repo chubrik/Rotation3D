@@ -74,13 +74,6 @@ public readonly struct DoubleEulerAngles
         return new DoubleEulerAngles(normYaw, Pitch, normRoll);
     }
 
-    [Obsolete("Need to prove")]
-    public DoubleAxisAngle UnitToAxisAngle()
-    {
-        Debug.Assert(IsUnit_F());
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// ✔ Proved by test: <see cref="Tests.EulerAnglesTests.UnitToMatrix"/>
     /// </summary>

@@ -18,61 +18,62 @@ public static class QuaternionFormulas
         return new Quaternion(x * invLen, y * invLen, z * invLen, w * invLen);
     }
 
-    [Obsolete("Draft")]
-    public static AxisAngle UnitToAxisAngle_Draft(this Quaternion quaternion)
+    /// <summary>
+    /// ✔ Proved by tests:
+    /// <br/><see cref="Tests.QuaternionTests.UnitToAxisAngle_MaxAngle"/>
+    /// <br/><see cref="Tests.QuaternionTests.UnitToAxisAngle_MidAngle"/>
+    /// <br/><see cref="Tests.QuaternionTests.UnitToAxisAngle_MinAngle"/>
+    /// </summary>
+    public static AxisAngle UnitToAxisAngle(this Quaternion quaternion)
     {
-        #region Explanations
-
-        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/
-        //
-        // public void set(Quat4d q1) {
-        //     if (q1.w > 1) q1.normalise(); // if w>1 acos and sqrt will produce errors, this cant happen if quaternion is normalised
-        //     angle = 2 * Math.acos(q1.w);
-        //     double s = Math.sqrt(1-q1.w*q1.w); // assuming quaternion normalised then w is less than 1, so term always positive.
-        //     if (s < 0.001) { // test to avoid divide by zero, s is always positive due to sqrt
-        //         // if s close to zero then direction of axis not important
-        //         x = q1.x; // if it is important that axis is normalised then replace with x=1; y=z=0;
-        //         y = q1.y;
-        //         z = q1.z;
-        //     } else {
-        //         x = q1.x / s; // normalise axis
-        //         y = q1.y / s;
-        //         z = q1.z / s;
-        //     }
-        // }
-
-        #endregion
+        /// Reference: <see cref="Legacy.LegacyQuaternionFormulas.UnitToAxisAngle_Legacy(Quaternion)"/>
 
         Debug.Assert(quaternion.IsUnitAbout());
         var (qX, qY, qZ, qW) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        var angle = Acos(qW) * 2f;
-        var s = Sqrt(1f - qW * qW);
-        float x, y, z;
+        float x, y, z, angle;
 
-        if (s < 0.001f)
+        // New formula for angle <90° to prevent singularity and bad axis normalization
+        if (Abs(qW) > 0.707106769f)
         {
-            x = qX;
-            y = qY;
-            z = qZ;
+            var axisLenSq = qX * qX + qY * qY + qZ * qZ;
+
+            // Angle <3.6e-17° is set to zero with no axis to prevent bad axis normalization
+            if (axisLenSq < 1e-37f)
+            {
+                x = y = z = angle = 0f;
+            }
+            else
+            {
+                var axisLen = Sqrt(axisLenSq);
+                var axisInvLen = 1f / axisLen;
+                x = qX * axisInvLen;
+                y = qY * axisInvLen;
+                z = qZ * axisInvLen;
+                angle = Asin(axisLen) * 2f;
+
+                if (qW < 0f)
+                    angle = -angle;
+            }
         }
         else
         {
-            var invS = 1f / s;
+            var invS = 1f / Sqrt(1f - qW * qW);
             x = qX * invS;
             y = qY * invS;
             z = qZ * invS;
+
+            // Negate calculation for angle >180° for more accuracy
+            if (qW < 0f)
+                angle = Acos(-qW) * -2f;
+            else
+                angle = Acos(qW) * 2f;
         }
 
         return new AxisAngle(x, y, z, angle);
     }
 
-    /// <summary>
-    /// ✔ Proved by tests:
-    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_MainZone"/>
-    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_MiddleZone"/>
-    /// <br/><see cref="Tests.QuaternionTests.UnitToEulerAngles_PolarZone"/>
-    /// </summary>
+    [Obsolete("Need to upgrade")]
     public static EulerAngles UnitToEulerAngles(this Quaternion quaternion)
     {
         #region Explanations
@@ -107,35 +108,34 @@ public static class QuaternionFormulas
         // 1. Flip axes: X => -Z; Z => X; roll => -roll
         // 2. 0.499 => 0.4999999 (89.966°)
         // 3. Fix yaw in poles: Atan2(-m13, m11)
+        // 4. Checked operations order
 
         #endregion
-
-        // todo Tune operations order
 
         Debug.Assert(quaternion.IsUnitAbout());
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
-        var halfSinPitch = x * w - y * z;
+        var halfSinPitch = w * x - y * z;
         float yaw, pitch, roll;
 
-        if (halfSinPitch > 0.4999999f) //todo
+        if (halfSinPitch > 0.4999999f)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
+            yaw = Atan2(w * y - x * z, 0.5f - y * y - z * z);
             pitch = F_HALF_PI;
             roll = 0f;
         }
         else if (halfSinPitch < -0.4999999f)
         {
-            yaw = Atan2(y * w - x * z, 0.5f - y * y - z * z);
+            yaw = Atan2(w * y - x * z, 0.5f - y * y - z * z);
             pitch = -F_HALF_PI;
             roll = 0f;
         }
         else
         {
             var xx = x * x;
-            yaw = Atan2(x * z + y * w, 0.5f - xx - y * y);
+            yaw = Atan2(w * y + x * z, 0.5f - xx - y * y);
             pitch = Asin(halfSinPitch * 2f);
-            roll = Atan2(x * y + z * w, 0.5f - xx - z * z);
+            roll = Atan2(w * z + x * y, 0.5f - xx - z * z);
         }
 
         return new EulerAngles(yaw, pitch, roll);
@@ -149,44 +149,7 @@ public static class QuaternionFormulas
     /// </summary>
     public static EulerAngles ScaledToEulerAngles(this Quaternion quaternion)
     {
-        #region Explanations
-
-        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-        //
-        // /** q1 can be non-normalised quaternion */
-        // 
-        // public void set(Quat4d q1) {
-        //     double sqw = q1.w*q1.w;
-        //     double sqx = q1.x*q1.x;
-        //     double sqy = q1.y*q1.y;
-        //     double sqz = q1.z*q1.z;
-        //     double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
-        //     double test = q1.x*q1.y + q1.z*q1.w;
-        //     if (test > 0.499*unit) { // singularity at north pole
-        //         heading = 2 * atan2(q1.x,q1.w);
-        //         attitude = Math.PI/2;
-        //         bank = 0;
-        //         return;
-        //     }
-        //     if (test < -0.499*unit) { // singularity at south pole
-        //         heading = -2 * atan2(q1.x,q1.w);
-        //         attitude = -Math.PI/2;
-        //         bank = 0;
-        //         return;
-        //     }
-        //     heading = atan2(2*q1.y*q1.w-2*q1.x*q1.z , sqx - sqy - sqz + sqw);
-        //     attitude = asin(2*test/unit);
-        //     bank = atan2(2*q1.x*q1.w-2*q1.y*q1.z , -sqx + sqy - sqz + sqw)
-        // }
-
-        // Changes:
-        // 1. Flip axes: X => -Z; Z => X; roll => -roll
-        // 2. 0.499 => 0.499999851 (89.956°)
-        // 3. Fix yaw in poles: Atan2(-m13, m11)
-
-        #endregion
-
-        // todo Tune operations order
+        /// Reference: <see cref="Legacy.LegacyQuaternionFormulas.ScaledToEulerAngles_Legacy(Quaternion)"/>
 
         var (x, y, z, w) = (quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
 
@@ -195,27 +158,41 @@ public static class QuaternionFormulas
         var zz = z * z;
         var ww = w * w;
 
-        var halfSinPitch = (x * w - y * z) / (xx + yy + zz + ww);
+        var m31 = (w * y + x * z) * 2f;
+        var m33 = ww - yy - (xx - zz);
+        var s = ww + yy + (xx + zz);
+        var halfSinPitch = (w * x - y * z) / s;
+
         float yaw, pitch, roll;
 
-        if (halfSinPitch > 0.499999851f) //todo
+        // Beyond 64° (20% of the sphere) the pitch error doubles
+        if (Abs(halfSinPitch) > 0.45f)
         {
-            yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
-            pitch = F_HALF_PI;
-            roll = 0f;
-        }
-        else if (halfSinPitch < -0.499999851f)
-        {
-            yaw = Atan2((y * w - x * z) * 2f, ww + xx - yy - zz);
-            pitch = -F_HALF_PI;
-            roll = 0f;
+            var invS = 1f / s;
+            var normM31 = m31 * invS;
+            var normM33 = m33 * invS;
+            var xzSinSq = normM31 * normM31 + normM33 * normM33;
+
+            // Closer to 0.022° the yaw and roll error dominates
+            if (xzSinSq < 1.47e-7f)
+            {
+                yaw = Atan2((w * y - x * z) * 2f, ww + xx - yy - zz);
+                pitch = halfSinPitch < 0f ? -F_HALF_PI : F_HALF_PI;
+                roll = 0f;
+
+                return new EulerAngles(yaw, pitch, roll);
+            }
+
+            pitch = F_HALF_PI - Asin(Sqrt(xzSinSq));
+
+            if (halfSinPitch < 0f)
+                pitch = -pitch;
         }
         else
-        {
-            yaw = Atan2((x * z + y * w) * 2f, ww - xx - yy + zz);
             pitch = Asin(halfSinPitch * 2f);
-            roll = Atan2((x * y + z * w) * 2f, ww - xx + yy - zz);
-        }
+
+        yaw = Atan2(m31, m33);
+        roll = Atan2((w * z + x * y) * 2f, ww - xx + (yy - zz));
 
         return new EulerAngles(yaw, pitch, roll);
     }
@@ -249,7 +226,7 @@ public static class QuaternionFormulas
 
         matrix.M21 = (xy - zw) * 2f;
         matrix.M22 = (0.5f - xx - zz) * 2f;
-        matrix.M23 = (xw + yz) * 2f;
+        matrix.M23 = (yz + xw) * 2f;
 
         matrix.M31 = (xz + yw) * 2f;
         matrix.M32 = (yz - xw) * 2f;
@@ -327,7 +304,7 @@ public static class QuaternionFormulas
 
         matrix.M21 = (xy - zw) * invSx2;
         matrix.M22 = (ww - zz + (yy - xx)) * invS;
-        matrix.M23 = (xw + yz) * invSx2;
+        matrix.M23 = (yz + xw) * invSx2;
 
         matrix.M31 = (xz + yw) * invSx2;
         matrix.M32 = (yz - xw) * invSx2;

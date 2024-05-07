@@ -15,46 +15,7 @@ public static class Matrix4x4Formulas
     /// </summary>
     public static EulerAngles UnitToEulerAngles(this Matrix4x4 matrix)
     {
-        #region Explanations
-
-        // Reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/
-        //
-        // /** this conversion uses conventions as described on page:
-        // *   https://www.euclideanspace.com/maths/geometry/rotations/euler/index.htm
-        // *   Coordinate System: right hand
-        // *   Positive angle: right hand
-        // *   Order of euler angles: heading first, then attitude, then bank
-        // *   matrix row column ordering:
-        // *   [m00 m01 m02]
-        // *   [m10 m11 m12]
-        // *   [m20 m21 m22]*/
-        // public final void rotate(matrix  m) {
-        //     // Assuming the angles are in radians.
-        //     if (m.m10 > 0.998) { // singularity at north pole
-        //         heading = Math.atan2(m.m02,m.m22);
-        //         attitude = Math.PI/2;
-        //         bank = 0;
-        //         return;
-        //     }
-        //     if (m.m10 < -0.998) { // singularity at south pole
-        //         heading = Math.atan2(m.m02,m.m22);
-        //         attitude = -Math.PI/2;
-        //         bank = 0;
-        //         return;
-        //     }
-        //     heading = Math.atan2(-m.m20,m.m00);
-        //     bank = Math.atan2(-m.m12,m.m11);
-        //     attitude = Math.asin(m.m10);
-        // }
-
-        // Changes:
-        //                  [00  01  02]    [ 33 -23 -13]
-        // 1. Flip matrix:  [10  11  12] => [-32  22 -12]
-        //                  [20  21  22]    [-31 -21  11]
-        //
-        // 2. 0.998 => 0.99999994 (89.980°)
-
-        #endregion
+        /// Reference: <see cref="Legacy.LegacyMatrix4x4Formulas.UnitToEulerAngles_Legacy(Matrix4x4)"/>
 
         Debug.Assert(matrix.IsUnitAbout());
 
@@ -63,24 +24,31 @@ public static class Matrix4x4Formulas
 
         float yaw, pitch, roll;
 
-        if (m32 < -0.99999994f) //todo
+        // Beyond 80° (3% of the sphere) the pitch error doubles
+        if (Abs(m32) > 0.9848077f)
         {
-            yaw = Atan2(-m13, m11);
-            pitch = F_HALF_PI;
-            roll = 0f;
-        }
-        else if (m32 > 0.99999994f)
-        {
-            yaw = Atan2(-m13, m11);
-            pitch = -F_HALF_PI;
-            roll = 0f;
+            var xzSinSq = m31 * m31 + m33 * m33;
+
+            // Closer to 1.2e-5° the yaw and roll error dominates
+            if (xzSinSq < 4.5e-14f)
+            {
+                yaw = Atan2(-m13, m11);
+                pitch = m32 > 0f ? -F_HALF_PI : F_HALF_PI;
+                roll = 0f;
+
+                return new EulerAngles(yaw, pitch, roll);
+            }
+
+            pitch = F_HALF_PI - Asin(Sqrt(xzSinSq));
+
+            if (m32 > 0f)
+                pitch = -pitch;
         }
         else
-        {
-            yaw = Atan2(m31, m33);
             pitch = Asin(-m32);
-            roll = Atan2(m12, m22);
-        }
+
+        yaw = Atan2(m31, m33);
+        roll = Atan2(m12, m22);
 
         return new EulerAngles(yaw, pitch, roll);
     }
@@ -88,21 +56,19 @@ public static class Matrix4x4Formulas
     [Obsolete("Draft")]
     public static EulerAngles ScaledToEulerAngles_Draft(this Matrix4x4 matrix)
     {
-        // Similar to the previous one, but supports a scaled matrix.
-
         var (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
             (matrix.M11, matrix.M12, matrix.M13, matrix.M21, matrix.M22, matrix.M23, matrix.M31, matrix.M32, matrix.M33);
 
         var sinPitch = -m32 / Sqrt(m31 * m31 + m32 * m32 + m33 * m33); // forward length
         float yaw, pitch, roll;
 
-        if (sinPitch > F_SIN_NEAR_90_UNAPPROVED)
+        if (sinPitch > 0.999999642f) //todo
         {
             yaw = Atan2(-m13, m11);
             pitch = F_HALF_PI;
             roll = 0f;
         }
-        else if (sinPitch < -F_SIN_NEAR_90_UNAPPROVED)
+        else if (sinPitch < -0.999999642f)
         {
             yaw = Atan2(-m13, m11);
             pitch = -F_HALF_PI;
@@ -150,15 +116,15 @@ public static class Matrix4x4Formulas
             x = Sqrt(m11 - m22 - m33 + 1f) * 0.5f;
             var invS = 0.25f / x;
             y = (m12 + m21) * invS;
-            z = (m13 + m31) * invS;
+            z = (m31 + m13) * invS;
             w = (m23 - m32) * invS;
         }
         else if (m22 > m33)
         {
-            y = Sqrt(m22 - m11 - m33 + 1f) * 0.5f;
+            y = Sqrt(m22 - m33 - m11 + 1f) * 0.5f;
             var invS = 0.25f / y;
-            x = (m21 + m12) * invS;
-            z = (m32 + m23) * invS;
+            x = (m12 + m21) * invS;
+            z = (m23 + m32) * invS;
             w = (m31 - m13) * invS;
         }
         else
@@ -166,7 +132,7 @@ public static class Matrix4x4Formulas
             z = Sqrt(m33 - m11 - m22 + 1f) * 0.5f;
             var invS = 0.25f / z;
             x = (m31 + m13) * invS;
-            y = (m32 + m23) * invS;
+            y = (m23 + m32) * invS;
             w = (m12 - m21) * invS;
         }
 

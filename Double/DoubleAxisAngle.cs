@@ -44,13 +44,6 @@ public readonly struct DoubleAxisAngle
         return new DoubleAxisAngle(axis, angle);
     }
 
-    [Obsolete("Need to prove")]
-    public DoubleEulerAngles UnitToEulerAngles()
-    {
-        //todo assert unit
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// ✔ Proved by Microsoft: <see cref="Matrix4x4.CreateFromAxisAngle(Vector3, float)"/>
     /// </summary>

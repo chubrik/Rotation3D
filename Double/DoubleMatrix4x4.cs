@@ -113,20 +113,6 @@ public struct DoubleMatrix4x4
         return matrix;
     }
 
-    [Obsolete("Need to prove")]
-    public readonly DoubleAxisAngle UnitToAxisAngle()
-    {
-        //todo assert unit
-        throw new NotImplementedException();
-    }
-
-    [Obsolete("Need to prove")]
-    public readonly DoubleEulerAngles UnitToEulerAngles()
-    {
-        //todo assert unit
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// ✔ Proved by Microsoft: <see cref="Quaternion.CreateFromRotationMatrix(Matrix4x4)"/>
     /// </summary>
