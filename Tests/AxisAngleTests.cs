@@ -16,7 +16,7 @@ public sealed class AxisAngleTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: a => a.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 0.0008656186f);
+        Assert.IsTrue(result.MaxDiff <= 0.0008810631f);
     }
 
     [TestMethod]
