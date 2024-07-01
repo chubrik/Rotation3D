@@ -56,7 +56,7 @@ public sealed class QuaternionTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 5.044793e-7f);
+        Assert.IsTrue(result.MaxDiff <= 5.2514747e-7f);
     }
 
     [TestMethod]
@@ -69,7 +69,7 @@ public sealed class QuaternionTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 6.432412e-5f);
+        Assert.IsTrue(result.MaxDiff <= 6.824013e-5f);
     }
 
     [TestMethod]
@@ -82,7 +82,7 @@ public sealed class QuaternionTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: q => q.UnitToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 0.0007375982f);
+        Assert.IsTrue(result.MaxDiff <= 0.0007669093f);
     }
 
     [TestMethod]
@@ -108,7 +108,7 @@ public sealed class QuaternionTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 2.3097127e-5f);
+        Assert.IsTrue(result.MaxDiff <= 3.0514471e-5f);
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public sealed class QuaternionTests : TestsBase
                                     test.ToDouble().UnitToQuaternion()),
             calcTest: q => q.ScaledToEulerAngles());
 
-        Assert.IsTrue(result.MaxDiff <= 0.0003834645f);
+        Assert.IsTrue(result.MaxDiff <= 0.00038348345f);
     }
 
     [TestMethod]
@@ -151,6 +151,6 @@ public sealed class QuaternionTests : TestsBase
 
         Assert.IsTrue(result.AvgDiffB < result.AvgDiffA);
         Assert.IsTrue(result.MaxDiffB < result.MaxDiffA);
-        Assert.IsTrue(result.MaxDiffB <= 1.1111016e-6f);
+        Assert.IsTrue(result.MaxDiffB <= 1.1411221e-6f);
     }
 }

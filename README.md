@@ -23,4 +23,4 @@ where Y (up) is yaw, X (right) is pitch, and Z (back) is roll.
 | **AxisAngle** | &nbsp;– | ❌ Not yet | ❌ Not yet | ❌ Not yet |
 | **EulerAngles** | ❌ Not yet | &nbsp;– | ❌ Not yet | ❌ Not yet |
 | **Matrix4x4** | ❌ Not yet | ⚠️ Draft | &nbsp;– | ❌ Not yet |
-| **Quaternion** | ❌ Not yet | ⏳ Small src ? | ⏳ Small src ? | &nbsp;– |
+| **Quaternion** | ❌ Not yet | ✅ Proved | ✅ Proved | &nbsp;– |
