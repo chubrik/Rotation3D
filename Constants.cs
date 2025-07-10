@@ -4,7 +4,7 @@ using Rotation3D.Double;
 
 public static class Constants
 {
-    public const int TestIterationCount = 1_000_000;
+    public const int TestIterationCount = 10_000_000;
 
     public const float F_PI = (float)Math.PI; // > double
     public const float F_HALF_PI = (float)DoubleConstants.HALF_PI; // > double
